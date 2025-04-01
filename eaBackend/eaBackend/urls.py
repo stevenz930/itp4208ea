@@ -23,8 +23,11 @@ from myapi import views
 router = DefaultRouter()
 router.register(r"lecturers", views.LecturerViewSet)
 router.register(r"courses", views.CourseViewSet)
+router.register(r"coursetypes", views.CourseTypeViewSet, basename="coursetype")
+router.register(r"courseFiltByType", views.CourseFiltByTypeViewSet, basename="courseFiltByType")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
+    #path("createapi/", views.CourseCreateView.as_view(), name='create Course'),
 ]

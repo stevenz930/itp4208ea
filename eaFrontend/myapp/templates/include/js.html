@@ -1,1 +1,48 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        scrollTable();
+        scrollTable1();
+    })
+
+    function scrollTable() {
+        let scrollTable = document.getElementById('scrollTable');
+        let scrollLeft = document.getElementById('scrollLeft');
+        let scrollRight = document.getElementById('scrollRight');
+
+        scrollLeft.addEventListener('click', function() {
+            scrollTable.scrollBy({
+                left: -(scrollTable.offsetWidth),
+                behavior: 'smooth'
+            })
+        })
+
+        scrollRight.addEventListener('click', function() {
+            scrollTable.scrollBy({
+                left: scrollTable.offsetWidth,
+                behavior: 'smooth'
+            })
+        })
+    }
+
+    function scrollTable1() {
+        let scrollTable1 = document.getElementById('scrollTable1');
+        let scrollLeft1 = document.getElementById('scrollLeft1');
+        let scrollRight1 = document.getElementById('scrollRight1');
+
+        scrollLeft1.addEventListener('click', function() {
+            scrollTable1.scrollBy({
+                left: -(scrollTable1.offsetWidth),
+                behavior: 'smooth'
+            })
+        })
+
+        scrollRight1.addEventListener('click', function() {
+            scrollTable1.scrollBy({
+                left: scrollTable1.offsetWidth,
+                behavior: 'smooth'
+            })
+        })
+    }
+</script>

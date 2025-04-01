@@ -29,10 +29,17 @@ def Home(request):
     courses = getData(api_url1)
     api_url2 = "http://127.0.0.1:8080/api/lecturers/"
     lecturers = getData(api_url2)
+    api_url3 = "http://127.0.0.1:8080/api/coursetypes/"
+    coursetypes = getData(api_url3)
+
+    #api_url = "http://127.0.0.1:8080/api/courseFiltByType/?search=Type1"
+    #courses_by_type = getData(api_url)
 
     context = {
         "courses": courses,
         "lecturers": lecturers,
+        "coursetypes": coursetypes,
+        #"courses_by_type": courses_by_type,
     }
     return render(request, "home.html", context)
     
