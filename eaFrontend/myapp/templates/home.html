@@ -1,67 +1,76 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="ratio ratio-21x9">
-    <img src="https://picsum.photos/1920/1080" class="img-fluid">
+<div class="container mw-75"><!-- head in home -->
+    <div class="ratio ratio-21x9" style="max-height: 75vh">
+        <img src="https://picsum.photos/1920/1080" class="img-fluid" style="object-fit: cover;">
+    </div>
+    <p class="h1 fw-bold text-primary">HOME PAGE</p>
+    <p class="py-2">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vel orci ex. Nam ut vulputate eros, et facilisis lorem. Vivamus ornare odio nisi, vitae egestas turpis auctor in. Duis sit amet dapibus lacus. Suspendisse potenti. Cras arcu velit, pulvinar ut ipsum sit amet, aliquam dignissim nibh. Aliquam tempus leo sit amet iaculis mollis. Vestibulum iaculis mauris erat, et feugiat arcu fringilla a.
+    </p>
 </div>
-<p class="h1 fw-bold text-primary">HOME PAGE</p>
-<p>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vel orci ex. Nam ut vulputate eros, et facilisis lorem. Vivamus ornare odio nisi, vitae egestas turpis auctor in. Duis sit amet dapibus lacus. Suspendisse potenti. Cras arcu velit, pulvinar ut ipsum sit amet, aliquam dignissim nibh. Aliquam tempus leo sit amet iaculis mollis. Vestibulum iaculis mauris erat, et feugiat arcu fringilla a.
-</p>
 
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    {% for coursetype in coursetypes %}
-        <li class="nav-item" role="presentation">
-            <button class="nav-link {% if forloop.first %}active{% endif %}" 
-                    id="{{ coursetype.courseType }}-tab" 
-                    data-bs-toggle="tab" 
-                    data-bs-target="#{{ coursetype.courseType }}" 
-                    type="button" 
-                    role="tab" 
-                    aria-controls="{{ coursetype.courseType }}" 
-                    aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
-                {{ coursetype.courseType }}
-            </button>
-        </li>
-    {% endfor %}
-</ul>
+<div class="container mw-75"><!-- template -->
 
-<div class="tab-content" id="myTabContent">
-    {% for coursetype in coursetypes %}
-        <div class="position-relative mt-1 tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ coursetype.courseType }}" role="tabpanel" aria-labelledby="{{ coursetype.courseType}}-tab">
-            <div class="d-flex overflow-hidden" id="scrollTable" style="max-width: 100%; width: 100%;">
-                {% for course in courses %}
-                    {% if course.courseType == coursetype.courseType %}
-                        <div class="px-1 w-25" style="min-width: 25%;">
-                            <div class="card">
-                                <img src="https://picsum.photos/900/600?random={{ course.id }}" class="card-img-top">
-                                <div class="card-body">
-                                    <p class="card-title h5 fw-bold">{{ course.title }}</p>
-                                    <p class="card-subtitle text-body-tertiary fs-6">{{ course.lecturer.name }}</p>
-                                    <p class="card-text h5 fw-bold mt-1">${{ course.price }}</p>
-                                    <a href="#" class="btn btn-primary btn-sm">View more</a>
+</div>
+
+<div class="container mw-75"><!-- nav tap with courseType -->
+    <ul class="nav nav-underline" id="myTab" role="tablist">
+        {% for coursetype in coursetypes %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold px-2{% if forloop.first %} active {% else %} text-secondary {% endif %}" 
+                        id="{{ coursetype.courseType }}-tab" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#{{ coursetype.courseType }}" 
+                        type="button" 
+                        role="tab" 
+                        aria-controls="{{ coursetype.courseType }}" 
+                        aria-selected="{% if forloop.first %} true {% else %} false {% endif %}">
+                    {{ coursetype.courseType }}
+                </button>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="container mx-0 mw-100 bg-body-secondary"><!-- list courses by course type -->
+    <div class="container mw-75 py-5">
+        <div class="tab-content" id="myTabContent">
+            {% for coursetype in coursetypes %}<!-- a group of specify course type -->
+                <div class="position-relative mt-1 tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ coursetype.courseType }}" role="tabpanel" aria-labelledby="{{ coursetype.courseType}}-tab">
+                    <div class="d-flex overflow-hidden" id="scrollTable" style="max-width: 100%; width: 100%;">
+                        {% for course in courses %}
+                            {% if course.courseType == coursetype.courseType %}<!-- all course card in the specify type -->
+                                <div class="px-1 w-25" style="min-width: 25%;">
+                                    <div class="card">
+                                        <img src="https://picsum.photos/900/600?random={{ course.id }}" class="card-img-top">
+                                        <div class="card-body">
+                                            <p class="card-title h5 fw-bold">{{ course.title }}</p>
+                                            <p class="card-subtitle text-body-tertiary fs-6 fw-light ">{{ course.lecturer.name }}</p>
+                                            <p class="card-text fs-5 fw-bold mt-1">${{ course.price }}</p>
+                                            <a href="#" class="btn btn-primary btn-sm">View more</a>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <button type="button" class="btn btn-light rounded-circle border position-absolute translate-middle top-50 start-0 d-flex justify-content-center align-items-center" 
-            style="width: 50px; height: 50px;" id="scrollLeft">
-                <p class="text-center fs-4 fw-bold m-0">&larr;</p>
-            </button>
-            <button type="button" class="btn btn-light rounded-circle border position-absolute translate-middle top-50 start-100 d-flex justify-content-center align-items-center" 
-            style="width: 50px; height: 50px;" id="scrollRight">
-                <p class="text-center fs-4 fw-bold m-0">&rarr;</p>
-            </button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-light rounded-circle border position-absolute translate-middle top-50 start-0 d-flex justify-content-center align-items-center" 
+                    style="width: 50px; height: 50px;" id="scrollLeft">
+                        <p class="text-center fs-4 fw-bold m-0">&larr;</p>
+                    </button>
+                    <button type="button" class="btn btn-light rounded-circle border position-absolute translate-middle top-50 start-100 d-flex justify-content-center align-items-center" 
+                    style="width: 50px; height: 50px;" id="scrollRight">
+                        <p class="text-center fs-4 fw-bold m-0">&rarr;</p>
+                    </button>
+                </div>
+            {% endfor %}
         </div>
-    {% endfor %}
+    </div>
 </div>
 
-<p>
-    Nam ac sollicitudin nibh. Donec sit amet nulla nisi. Donec tellus lacus, elementum a sagittis sed, pharetra faucibus metus. Aenean sed varius justo. Nunc eu dolor mi. Duis sodales nisi sit amet nulla vehicula aliquam. Quisque sem lectus, venenatis quis quam id, egestas viverra lorem. Sed vestibulum dapibus tristique. Nunc sit amet efficitur lorem, eu eleifend velit. Proin vel sapien non libero dignissim sollicitudin eu sit amet leo. Maecenas sodales arcu in felis volutpat eleifend. Sed non consectetur lorem. Aenean venenatis mi libero, finibus dictum orci sodales id. Aliquam aliquet vestibulum auctor.
-</p>
-
+<!--
 <div class="position-relative mt-1">
     <div class="d-flex overflow-hidden" id="scrollTable1" style="max-width: 100%; width: 100%;">
         {% for course in courses %}
@@ -87,32 +96,47 @@
         <p class="text-center fs-4 fw-bold m-0">&rarr;</p>
     </button>
 </div>
+-->
 
-<p>
-    Aliquam erat volutpat. Pellentesque vel mollis lorem. Praesent ex velit, sollicitudin porta leo vel, finibus porttitor neque. In iaculis dapibus tellus. Vivamus felis turpis, convallis et magna sit amet, sollicitudin laoreet nisi. Maecenas iaculis semper placerat. Ut ac scelerisque mi. Phasellus odio quam, tincidunt ut dignissim eu, fermentum quis lorem. Cras bibendum quam dapibus nulla lobortis, vitae ultrices mauris porttitor. Donec faucibus lacinia mi vitae aliquam. Integer eros arcu, dignissim sed magna in, ultrices vehicula tellus.
-</p>
 
-<div class="d-flex justify-content-start flex-nowrap flex-shrink-0">
-    {% for lecturer in lecturers %}
-        {% if lecturer.id < 4 %}
-            <div class="px-1 w-25">
-                <div class="card">
-                    <img src="https://picsum.photos/900/600?random={{ lecturer.id }}" class="card-img-top">
-                    <div class="card-body">
-                        <p class="card-title h5 fw-bold">{{ lecturer.name }}</p>
-                        <p class="card-subtitle text-body-tertiary fs-6">{{ lecturer.description }}</p>
-                        <a href="#" class="btn btn-primary btn-sm">View more</a>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    {% endfor %}
+<div class="container mw-75 my-5"><!-- template -->
+    <p>
+        Nam ac sollicitudin nibh. Donec sit amet nulla nisi. Donec tellus lacus, elementum a sagittis sed, pharetra faucibus metus. Aenean sed varius justo. Nunc eu dolor mi. Duis sodales nisi sit amet nulla vehicula aliquam. Quisque sem lectus, venenatis quis quam id, egestas viverra lorem. Sed vestibulum dapibus tristique. Nunc sit amet efficitur lorem, eu eleifend velit. Proin vel sapien non libero dignissim sollicitudin eu sit amet leo. Maecenas sodales arcu in felis volutpat eleifend. Sed non consectetur lorem. Aenean venenatis mi libero, finibus dictum orci sodales id. Aliquam aliquet vestibulum auctor.
+    </p>
+    <p>
+        Aliquam erat volutpat. Pellentesque vel mollis lorem. Praesent ex velit, sollicitudin porta leo vel, finibus porttitor neque. In iaculis dapibus tellus. Vivamus felis turpis, convallis et magna sit amet, sollicitudin laoreet nisi. Maecenas iaculis semper placerat. Ut ac scelerisque mi. Phasellus odio quam, tincidunt ut dignissim eu, fermentum quis lorem. Cras bibendum quam dapibus nulla lobortis, vitae ultrices mauris porttitor. Donec faucibus lacinia mi vitae aliquam. Integer eros arcu, dignissim sed magna in, ultrices vehicula tellus.
+    </p>
 </div>
 
-<p>
-    Donec nec rhoncus nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nulla facilisi. Pellentesque facilisis, ipsum in suscipit rhoncus, dolor lacus aliquam tortor, a blandit dui ligula et ante. Aliquam auctor pretium urna, ac placerat est suscipit non. Suspendisse luctus risus felis, ut egestas magna placerat non. Sed a dui eu felis interdum suscipit eu convallis dolor. In condimentum leo eros, sit amet laoreet nisi feugiat eget. Integer dictum est luctus lectus lacinia, eget luctus leo mollis. Pellentesque ut massa at nisl placerat consequat. Duis ultrices consequat ante eu fermentum. Nunc aliquet ex vitae libero pretium varius. Nam enim neque, eleifend id cursus in, ultricies ac ante. Ut lobortis lorem non efficitur tempus. Maecenas commodo, lectus a consectetur faucibus, sem mauris mollis enim, id fermentum mauris est non dolor.
-</p>
-<p>
-    Praesent posuere nulla ac leo venenatis ultricies. Donec sodales sapien sed pulvinar faucibus. Vivamus semper felis lacus, et viverra sem bibendum ut. Etiam nisi justo, varius quis venenatis ac, imperdiet ac leo. Morbi pellentesque lectus a libero tincidunt ultricies. Nulla pulvinar, nisl in sodales pellentesque, turpis libero aliquet ipsum, quis facilisis ante nunc ut neque. In hac habitasse platea dictumst. Donec convallis odio id lorem vulputate dignissim. Suspendisse sagittis sem quis aliquet maximus. Fusce consectetur nulla quis risus hendrerit fermentum. Proin id magna mauris. Donec id sem eget sapien fringilla volutpat. In et interdum nibh, id venenatis mi. Donec congue massa dolor, id malesuada lacus eleifend sed. Praesent vel dolor et diam cursus tristique in imperdiet eros.
-</p>
+<div class="container mx-0 mw-100 bg-body-secondary"><!-- show lecturer -->
+    <div class="container mw-75 py-5">
+        <p class="h1 fw-bold">OUR LECTURERS</p>
+        <div class="d-flex justify-content-start flex-nowrap flex-shrink-0">
+            {% for lecturer in lecturers %}
+                {% if lecturer.id < 4 %}
+                    <div class="px-1 w-25">
+                        <div class="card">
+                            <img src="https://picsum.photos/900/600?random={{ lecturer.id }}" class="card-img-top">
+                            <div class="card-body">
+                                <p class="card-title h5 fw-bold">{{ lecturer.name }}</p>
+                                <p class="card-subtitle text-body-tertiary fs-6">{{ lecturer.description }}</p>
+                                <a href="#" class="btn btn-primary btn-sm">View more</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="container mw-75 my-5"><!-- template -->
+    <p>
+        Donec nec rhoncus nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nulla facilisi. Pellentesque facilisis, ipsum in suscipit rhoncus, dolor lacus aliquam tortor, a blandit dui ligula et ante. Aliquam auctor pretium urna, ac placerat est suscipit non. Suspendisse luctus risus felis, ut egestas magna placerat non. Sed a dui eu felis interdum suscipit eu convallis dolor. In condimentum leo eros, sit amet laoreet nisi feugiat eget. Integer dictum est luctus lectus lacinia, eget luctus leo mollis. Pellentesque ut massa at nisl placerat consequat. Duis ultrices consequat ante eu fermentum. Nunc aliquet ex vitae libero pretium varius. Nam enim neque, eleifend id cursus in, ultricies ac ante. Ut lobortis lorem non efficitur tempus. Maecenas commodo, lectus a consectetur faucibus, sem mauris mollis enim, id fermentum mauris est non dolor.
+    </p>
+    <p>
+        Praesent posuere nulla ac leo venenatis ultricies. Donec sodales sapien sed pulvinar faucibus. Vivamus semper felis lacus, et viverra sem bibendum ut. Etiam nisi justo, varius quis venenatis ac, imperdiet ac leo. Morbi pellentesque lectus a libero tincidunt ultricies. Nulla pulvinar, nisl in sodales pellentesque, turpis libero aliquet ipsum, quis facilisis ante nunc ut neque. In hac habitasse platea dictumst. Donec convallis odio id lorem vulputate dignissim. Suspendisse sagittis sem quis aliquet maximus. Fusce consectetur nulla quis risus hendrerit fermentum. Proin id magna mauris. Donec id sem eget sapien fringilla volutpat. In et interdum nibh, id venenatis mi. Donec congue massa dolor, id malesuada lacus eleifend sed. Praesent vel dolor et diam cursus tristique in imperdiet eros.
+    </p>
+</div>
+
 {% endblock %}
