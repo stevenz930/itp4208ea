@@ -1,0 +1,44 @@
+<!-- registration/login.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4">Login</h2>
+          
+          {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+          {% endif %}
+          
+          <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label for="email" class="form-label">Email or Username</label>
+              <input type="text" class="form-control" id="email" name="email" required>
+            </div>
+            
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg">Login</button>
+            </div>
+            
+            <div class="mt-3 text-center">
+              <p class="text-muted">Not registered? 
+                <a href="{% url 'signup' %}" class="text-decoration-none">Create an account</a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
