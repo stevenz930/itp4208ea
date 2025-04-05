@@ -17,13 +17,14 @@ Including another URLconf
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from . import views
-from .views import home_view, setup_profile, profile_settings
+from .views import home_view, profile, profile_settings
 
 urlpatterns = [
     path('', home_view, name='home'),
     path('login/', views.custom_login, name='login'),
     path('signup/', views.signup, name='signup'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
-    path('setup-profile/', setup_profile, name='setup_profile'),
+    # path('setup-profile/', setup_profile, name='setup_profile'),
+    path('profile/',profile,name='profile'),
     path('settings/', profile_settings, name='profile_settings'),
 ]

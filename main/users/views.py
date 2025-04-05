@@ -43,22 +43,26 @@ def signup(request):
         form = CustomUserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+@login_required(login_url='login')
+def profile(request):
+    user = request.user
+    return render(request,'profile/profile.html',{'user':user})
 
-@login_required
-def setup_profile(request):
-    # Check if profile already has basic info
-    if request.user.username and request.user.email:
-        return redirect('profile_settings')
+# @login_required
+# def setup_profile(request):
+#     # Check if profile already has basic info
+#     if request.user.username and request.user.email:
+#         return redirect('profile_settings')
     
-    if request.method == 'POST':
-        form = ProfileSetupForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect('profile_settings')
-    else:
-        form = ProfileSetupForm(instance=request.user)
+#     if request.method == 'POST':
+#         form = ProfileSetupForm(request.POST, request.FILES, instance=request.user)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('profile_settings')
+#     else:
+#         form = ProfileSetupForm(instance=request.user)
     
-    return render(request, 'setup_profile.html', {'form': form})
+#     return render(request, 'setup_profile.html', {'form': form})
 
 @login_required
 def profile_settings(request):
@@ -76,4 +80,4 @@ def profile_settings(request):
     else:
         form = ProfileSettingsForm(instance=request.user)
     
-    return render(request, 'profile_settings.html', {'form': form})
+    return render(request, 'profile/profile_settings.html', {'form': form})

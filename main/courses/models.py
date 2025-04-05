@@ -7,9 +7,7 @@ class Subject(models.Model):
     slug = models.SlugField(unique=True)
     is_active = models.BooleanField(default=True)
 
- 
-       
-    
+
     def __str__(self):
         return self.name
 
@@ -71,9 +69,48 @@ class Course(models.Model):
     is_published = models.BooleanField(default=False)
     level = models.CharField(max_length=2, choices=LEVEL_CHOICES, default='BG')
     thumbnail = models.ImageField(upload_to='course_thumbnails/')
+    average_rating = models.FloatField(default=0.0)
+    rating_count = models.PositiveIntegerField(default=0)
+    
+    @property
+    def total_duration(self):
+        """Returns total course duration in hours by summing all lesson durations"""
+        total_seconds = sum(
+            lesson.duration.total_seconds() 
+            for lesson in self.lessons.all() 
+            if lesson.duration  # Only count lessons with duration set
+        )
+        return round(total_seconds / 3600, 1)  # Convert seconds to hours
+    
+    @property
+    def total_duration_minutes(self):
+        """Alternative: Returns total duration in minutes"""
+        return sum(
+            lesson.duration.total_seconds() / 60 
+            for lesson in self.lessons.all() 
+            if lesson.duration
+        )
     
     def __str__(self):
         return self.title
+
+class Review(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='reviews')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])  # 1-5 stars
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)    
+
+
+
+
+    def clean(self):
+        if self.student == self.course.instructor:
+            raise ValidationError("Instructors cannot review their own courses")
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)    
         
 class Lesson(models.Model):
     course = models.ForeignKey(
@@ -160,3 +197,4 @@ class LessonProgress(models.Model):
     
     def __str__(self):
         return f"{self.enrollment.student.username} - {self.lesson.title} ({self.status})"
+

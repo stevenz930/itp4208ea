@@ -41,10 +41,10 @@ class CustomUser(AbstractUser):
 
     objects = CustomUserManager()
 
-    facebook_url = models.URLField(blank=True)
-    twitter_url = models.URLField(blank=True)
-    instagram_url = models.URLField(blank=True)
-    linkedin_url = models.URLField(blank=True)
+    facebook_url = models.URLField(blank=True, null=True)
+    twitter_url = models.URLField(blank=True, null=True)
+    instagram_url = models.URLField(blank=True, null=True)
+    linkedin_url = models.URLField(blank=True, null=True)
     
     def __str__(self):
         return self.username
