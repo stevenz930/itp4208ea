@@ -230,7 +230,7 @@
                 <div class="row">
                     {% for course in courses %}
                     <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card course-card h-100">
+                        <div class="card course-card h-100" onclick="window.location.href='{% url 'course_detail' course.id %}';" style="cursor: pointer;">
                             <div class="course-card-img-container">
                                 <img src="{{ course.thumbnail.url }}" class="course-card-img" alt="{{ course.title }}">
                             </div>
