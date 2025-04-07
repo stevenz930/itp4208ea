@@ -97,8 +97,10 @@ def profile_settings(request):
 
 def instructor_detail(request, instructor_id):
     instructor = CustomUser.objects.filter(is_instructor=True, id=instructor_id)
+    courses = Course.objects.filter(instructor=instructor_id)
 
     context = {
         "instructor": instructor,
+        "courses": courses,
     }
     return render(request, 'instructor_detail.html', context)

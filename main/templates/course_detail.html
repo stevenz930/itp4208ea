@@ -29,7 +29,7 @@
                 <!--p class="">Instructor ID: {{ item.instructor_id }}</p-->
                 <div class="d-flex">
                     <p class="me-2 fw-bold text-info">Instructor: </p>
-                    <p class="ms-2 ">{{ item.instructor.first_name }} {{ item.instructor.last_name }}</p>
+                    <p class="ms-2 " onclick="window.location.href='{% url 'instructor_detail' item.instructor.id %}';" style="cursor: pointer;">{{ item.instructor.first_name }} {{ item.instructor.last_name }}</p>
                 </div>
                 <!--p class="">Category ID: {{ item.category.id }}</!p-->
                 <div class="d-flex">
