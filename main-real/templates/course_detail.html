@@ -58,7 +58,12 @@
                         {% if is_enrolled %}
                             <a href="#lessons" class="btn btn-success w-100 mb-2">Continue Learning</a>
                         {% else %}
-                            <a href="#" class="btn btn-primary w-100 mb-2 text-decoration-line-through">Enroll Now</a>
+                            <form method="POST" action="{% url 'enroll_course' course.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary w-100 mb-2 text-decoration-line-through">
+                                    Enroll Now
+                                </button>
+                            </form>
                             <a href="#" class="btn btn-outline-primary w-100 text-decoration-line-through">Add to Wishlist</a>
                         {% endif %}
                     </div>
@@ -162,11 +167,7 @@
                 <h5 class="modal-title">Write a Review</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" action="{% url 'submit_review' course.id %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <!-- Add your review form here -->
-                </div>
+            
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Submit Review</button>

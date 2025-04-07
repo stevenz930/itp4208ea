@@ -1,8 +1,10 @@
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render,get_object_or_404, redirect
 from .models import Subject, Course, CourseCategory, Lesson, Review, Enrollments
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 def course_list(request):
     courses = Course.objects.filter(is_published=True)
@@ -118,3 +120,43 @@ def course_detail(request, course_id):
         "is_enrolled": is_enrolled,
     }
     return render(request, 'course_detail.html', context)
+
+@login_required
+def enroll_course(request, course_id):
+    if request.method == 'POST':
+        course = get_object_or_404(Course, is_published=True, id=course_id)
+        
+        
+        existing_enrollment = Enrollments.objects.filter(
+            student=request.user,
+            Course=course
+        ).exists()
+        
+        if not existing_enrollment:
+            
+            Enrollments.objects.create(
+                student=request.user,
+                Course=course
+            )
+            messages.success(request, f'Successfully enrolled in {course.title}!')
+        else:
+            messages.info(request, 'You are already enrolled in this course.')
+        
+        
+        return redirect('course_detail', course_id=course_id)
+
+@login_required
+def my_study(request):
+    enrolled_courses = Enrollments.objects.filter(
+        student=request.user
+    ).select_related(
+        'Course',
+        'Course__instructor'
+    ).prefetch_related(
+        'Course__reviews'
+    ).order_by('-enrolled_at')
+
+    context = {
+        'enrolled_courses': enrolled_courses,
+    }
+    return render(request, 'my_study.html', context)

@@ -7,8 +7,8 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/course_list.css' %}">
 <script src="{% static 'js/course_list.js' %}"></script>
-
-<div class="container my-5">
+<div class="d-flex flex-column min-vh-100">
+<div class="container flex-grow-1 my-5">
     <h1>Search results</h1>
     {% if courses %}
         <div class="row">
