@@ -2,11 +2,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.db.models import Q
 from .forms import CustomUserCreationForm, ProfileSettingsForm
 from .backends import EmailOrUsernameModelBackend
 from django.contrib.auth.decorators import login_required
 from courses.models import Course, CourseCategory
 from users.models import CustomUser
+from django.http import JsonResponse
 
 def home_view(request):
     courses = Course.objects.filter(is_published=True).distinct()#all course data
@@ -61,29 +63,29 @@ def profile(request):
     user = request.user
     return render(request,'profile/profile.html',{'user':user})
 
-# @login_required
-# def setup_profile(request):
-#     # Check if profile already has basic info
-#     if request.user.username and request.user.email:
-#         return redirect('profile_settings')
+@login_required
+def setup_profile(request):
+    # Check if profile already has basic info
+    if request.user.username and request.user.email:
+        return redirect('profile_settings')
     
-#     if request.method == 'POST':
-#         form = ProfileSetupForm(request.POST, request.FILES, instance=request.user)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('profile_settings')
-#     else:
-#         form = ProfileSetupForm(instance=request.user)
+    if request.method == 'POST':
+        form = ProfileSetupForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile_settings')
+    else:
+        form = ProfileSetupForm(instance=request.user)
     
-#     return render(request, 'setup_profile.html', {'form': form})
+    return render(request, 'setup_profile.html', {'form': form})
 
 @login_required
 def profile_settings(request):
     if request.method == 'POST':
-        # Explicitly specify data sources
+       
         form = ProfileSettingsForm(
-            data=request.POST,  # Explicit POST data
-            files=request.FILES,  # Explicit files
+            data=request.POST,  
+            files=request.FILES,  
             instance=request.user
         )
         if form.is_valid():
@@ -94,3 +96,76 @@ def profile_settings(request):
         form = ProfileSettingsForm(instance=request.user)
     
     return render(request, 'profile/profile_settings.html', {'form': form})
+
+def search_courses(request):
+    query = request.GET.get('q', '')
+    if query:
+        courses = Course.objects.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(tags__name__icontains=query) |
+            Q(instructor__username__icontains=query) |
+            Q(instructor__email__icontains=query)
+        )
+        query_lower = query.lower()
+        filtered_courses = [
+            course for course in courses
+            if (query_lower in course.title.lower() or
+                query_lower in course.description.lower() or
+                any(query_lower in tag.name.lower() for tag in course.tags.all()) or
+                query_lower in course.instructor.username.lower() or
+                query_lower in course.instructor.email.lower())
+        ]
+    else:
+        filtered_courses = Course.objects.all()
+    context = {
+        'courses': filtered_courses,
+        'query': query,
+    }
+    return render(request, 'search_results.html', context)
+
+
+def autocomplete(request):
+    query = request.GET.get('q', '')
+    if query:
+        courses = Course.objects.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(tags__name__icontains=query) |
+            Q(instructor__username__icontains=query) |
+            Q(instructor__email__icontains=query),
+            is_published=True
+        )[:10]
+        query_lower = query.lower()
+        filtered_courses = [
+            course for course in courses
+            if (query_lower in course.title.lower() or
+                query_lower in course.description.lower() or
+                any(query_lower in tag.name.lower() for tag in course.tags.all()) or
+                query_lower in course.instructor.username.lower() or
+                query_lower in course.instructor.email.lower())
+        ][:5]
+        suggestions = [
+            {'title': course.title, 'instructor': course.instructor.username}
+            for course in filtered_courses
+        ]
+    else:
+        suggestions = []
+    return JsonResponse({'suggestions': suggestions})
+
+def privacy_policy(request):
+    return render(request, 'pages/privacy_policy.html')
+
+def custom_logout(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('home')
+
+def terms_of_service(request):
+    return render(request, 'pages/terms_of_service.html')
+
+def refund_policy(request):
+    return render(request, 'pages/refund_policy.html')
+    
+def faq(request):
+    return render(request, 'pages/faq.html')

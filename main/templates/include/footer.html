@@ -11,11 +11,16 @@
           </div>
           <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis pretium dui. Pellentesque habitant </p>
           
+          
           <div class="social-icons mt-3">
-            <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://facebook.com/learnhub_official" class="text-white me-3" target="_blank"
+              title="Follow us on Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://twitter.com/learnhub_official" class="text-white me-3" target="_blank"
+              title="Follow us on Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com/learnhu" class="text-white me-3" target="_blank"
+              title="Follow us on Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://linkedin.com/company/learnhub_official" class="text-white" target="_blank"
+              title="Connect with us on LinkedIn"><i class="fab fa-linkedin-in"></i></a>
           </div>
         </div>
   
@@ -25,8 +30,7 @@
             <div class="col-6">
               <h5 class="mb-3">Quick Links</h5>
               <ul class="list-unstyled">
-                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Home</a></li>
-                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">About Us</a></li>
+                <li class="mb-2"><a href="{% url 'home' %}" class="text-decoration-none text-muted">Home</a></li>                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">About Us</a></li>
                 <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Services</a></li>
                 <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Contact</a></li>
               </ul>
@@ -34,10 +38,10 @@
             <div class="col-6">
               <h5 class="mb-3">Legal</h5>
               <ul class="list-unstyled">
-                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Privacy Policy</a></li>
-                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Terms of Service</a></li>
-                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Refund Policy</a></li>
-                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">FAQ</a></li>
+                <li class="mb-2"><a href="{% url 'privacy_policy' %}" class="text-decoration-none text-muted">Privacy Policy</a></li>
+                <li class="mb-2"><a href="{% url 'terms_of_service' %}" class="text-decoration-none text-muted">Terms of Service</a></li>
+                <li class="mb-2"><a href="{% url 'refund_policy' %}" class="text-decoration-none text-muted">Refund Policy</a></li>
+                <li class="mb-2"><a href="{% url 'faq' %}" class="text-decoration-none text-muted">FAQ</a></li>
               </ul>
             </div>
           </div>
