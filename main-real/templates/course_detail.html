@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load course_extras %}
 
 {% block content %}
 <div class="text-bg-dark">
@@ -114,31 +115,82 @@
         </div>
     </div>
 </section>
-
 <!-- Reviews Section -->
 <section class="py-5 bg-light" id="reviews">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="h2 mb-0">Student Reviews</h2>
             {% if is_enrolled %}
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#reviewModal">
                     Write a Review
                 </button>
+                <!-- need write comment from  -->
             {% endif %}
+        </div>
+
+        <!-- Rating Summary Section-->
+        <div class="row g-0 mb-5">
+            <!-- Rating Display -->
+            <div class="col-12 col-md-4 pe-md-0">
+                <div class="card border-0 bg-white shadow-none shadow-md-sm p-3 p-md-4 h-100 rounded-top rounded-md-start rounded-md-end-0">
+                    <div class="text-center">
+                        <h1 class="display-4 fw-bold  mb-0">{{ course.average_rating|default:0|floatformat:1 }}</h1>
+                        <div class="text-warning mb-2" style="font-size: 1.5rem;">
+                            {% with stars=course.average_rating|default:0|show_stars %}
+                                {% for star_class in stars %}
+                                    <i class="{{ star_class }}"></i>
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <p class="text-muted mb-0">{{ course.reviews.count }} reviews</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rating Progress Bars -->
+            <div class="col-12 col-md-8 ps-md-0">
+                <div class="card border-0 bg-white shadow-none shadow-md-sm p-3 p-md-4 h-100 rounded-bottom rounded-md-end rounded-md-start-0">
+                    {% for rating in "54321"|make_list %}
+                        {% with count=course|rating_count:rating total=course.reviews.count %}
+                            <div class="rating-bar mb-2">
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2" style="min-width: 30px;">
+                                        {{ rating }} <span class="text-warning" style="font-size: 1.2em;">★</span>
+                                    </span>
+                                    <div class="progress flex-grow-1 mx-2" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" 
+                                             style="width: {% if total > 0 %}{% widthratio count total 100 %}{% else %}0{% endif %}%" 
+                                             aria-valuenow="{% if total > 0 %}{% widthratio count total 100 %}{% else %}0{% endif %}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100"></div>
+                                    </div>
+                                    <span class="ms-2 text-muted small" style="min-width: 40px;">
+                                        {% if total > 0 %}{% widthratio count total 100 %}{% else %}0{% endif %}%
+                                    </span>
+                                </div>
+                            </div>
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            </div>
         </div>
 
         {% if reviews %}
             <div class="row g-4">
                 {% for review in reviews %}
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <div class="card h-100">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between mb-3">
                                     <div>
                                         <h5 class="card-title mb-1">{{ review.student.get_full_name }}</h5>
                                         <div class="text-warning">
-                                            {% for i in review.rating|make_list %}
-                                                <i class="bi bi-star-fill"></i>
+                                            {% for i in "12345"|make_list %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -158,24 +210,39 @@
     </div>
 </section>
 
-{% if is_enrolled %}
-<!-- Review Modal -->
-<div class="modal fade" id="reviewModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Write a Review</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Review</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endif %}
+<style>
+    .star_class{
+        color: gold;
+    }
+    @media (max-width: 768) {
+        #reviews .display-4 {
+            font-size: 2.5rem;
+        }
+        #reviews .rating-bar {
+            font-size: 0.9rem;
+        }
+
+        #reviews .card {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+
+        #reviews .row.g-0 > div:first-child .card {
+            border-top-left-radius: 0.5rem !important;
+            border-top-right-radius: 0.5rem !important;
+        }
+
+        #reviews .row.g-0 > div:last-child .card {
+            border-bottom-left-radius: 0.5rem !important;
+            border-bottom-right-radius: 0.5rem !important;
+        }
+    }
+
+    @media (min-width: 768px) {
+        #reviews .shadow-none.shadow-md-sm {
+            box-shadow: var(--bs-box-shadow-sm) !important;
+        }
+    }
+</style>
 
 {% endblock %}

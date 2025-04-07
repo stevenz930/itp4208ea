@@ -198,3 +198,11 @@ class LessonProgress(models.Model):
     def __str__(self):
         return f"{self.enrollment.student.username} - {self.lesson.title} ({self.status})"
 
+def get_rating_counts(self):
+    return {
+        '5': self.reviews.filter(rating=5).count(),
+        '4': self.reviews.filter(rating=4).count(),
+        '3': self.reviews.filter(rating=3).count(),
+        '2': self.reviews.filter(rating=2).count(),
+        '1': self.reviews.filter(rating=1).count()
+    }

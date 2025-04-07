@@ -45,3 +45,14 @@ def modify_query(*args, **kwargs):
             query_dict[key] = value
     
     return query_dict.urlencode()
+@register.filter
+def get_item(dictionary, key):
+    """Safely get a value from a dictionary with a string key"""
+    if hasattr(dictionary, 'get'):
+        return dictionary.get(str(key), 0)  # Returns 0 if key doesn't exist
+    return 0  # Return 0 if input isn't a dictionary
+
+@register.filter
+def rating_count(course, rating):
+    """Returns count of reviews with specific rating for a course"""
+    return course.reviews.filter(rating=rating).count()
