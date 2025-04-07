@@ -94,3 +94,11 @@ def profile_settings(request):
         form = ProfileSettingsForm(instance=request.user)
     
     return render(request, 'profile/profile_settings.html', {'form': form})
+
+def instructor_detail(request, instructor_id):
+    instructor = CustomUser.objects.filter(is_instructor=True, id=instructor_id)
+
+    context = {
+        "instructor": instructor,
+    }
+    return render(request, 'instructor_detail.html', context)

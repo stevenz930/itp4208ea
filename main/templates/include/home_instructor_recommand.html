@@ -6,7 +6,7 @@
         <div class="container mw-75 position-relative"><!-- nav tap with courseType -->
             <ul class="nav nav-underline d-flex flex-nowrap overflow-hidden px-0 align-items-end" id="scrollInstructor" role="tablist" style="max-width: 100%; width: 100%;">
                 {% for instructor in instructors %}
-                    <div class="card" role="presentation" style="min-width: 25%;">
+                    <div class="card" role="presentation" onclick="window.location.href='{% url 'instructor_detail' instructor.id %}';" style="min-width: 25%; cursor: pointer;">
                         <img src="{{ instructor.avatar.url }}" class="card-img-top">
                         <p class="card-subtitle fs-5 fw-bold mx-2 my-3">{{ instructor.first_name }} {{ instructor.last_name }}</p>
                     </div>
