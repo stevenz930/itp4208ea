@@ -1,9 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}Home{% endblock %}
 
 {% block content %}
-
 {% include 'include/home_caro.html'%}
+
 
 <div class="">
   {% if user.is_authenticated %}
@@ -24,6 +26,7 @@
   {% include 'include/home_tes.html'%}
 
   {% include 'include/home_instructor_recommand.html' %}
+  
 
 </div>
 {% endblock %}
