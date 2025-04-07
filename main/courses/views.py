@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from .models import Subject, Course, CourseCategory, Lesson, Review
+from django.shortcuts import render,get_object_or_404
+from .models import Subject, Course, CourseCategory, Lesson, Review, Enrollments
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
@@ -94,14 +94,27 @@ def course_list(request):
     return render(request, 'course_list.html', context)
 
 
+
 def course_detail(request, course_id):
-    course = Course.objects.filter(is_published=True, id=course_id)
-    lessons = Lesson.objects.filter(course=course_id)
-    reviews = Review.objects.filter(course=course_id)
+
+    course = get_object_or_404(Course, is_published=True, id=course_id)
+    
+    # Efficiently fetch related data
+    lessons = Lesson.objects.filter(course=course).order_by('order')
+    reviews = Review.objects.select_related('student').filter(course=course).order_by('-created_at')
+    
+ 
+    is_enrolled = False
+    if request.user.is_authenticated:
+        is_enrolled = Enrollments.objects.filter(
+            student=request.user,
+            Course=course
+        ).exists()
 
     context = {
         "course": course,
         "lessons": lessons,
         "reviews": reviews,
+        "is_enrolled": is_enrolled,
     }
     return render(request, 'course_detail.html', context)
