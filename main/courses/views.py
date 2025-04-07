@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Subject, Course, CourseCategory
+from .models import Subject, Course, CourseCategory, Lesson, Review
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
@@ -92,4 +92,16 @@ def course_list(request):
         'subjects': subjects,
     }
     return render(request, 'course_list.html', context)
-    
+
+
+def course_detail(request, course_id):
+    course = Course.objects.filter(is_published=True, id=course_id)
+    lessons = Lesson.objects.filter(course=course_id)
+    reviews = Review.objects.filter(course=course_id)
+
+    context = {
+        "course": course,
+        "lessons": lessons,
+        "reviews": reviews,
+    }
+    return render(request, 'course_detail.html', context)

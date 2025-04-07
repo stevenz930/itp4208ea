@@ -5,10 +5,23 @@ from django.contrib import messages
 from .forms import CustomUserCreationForm, ProfileSettingsForm
 from .backends import EmailOrUsernameModelBackend
 from django.contrib.auth.decorators import login_required
-
+from courses.models import Course, CourseCategory
+from users.models import CustomUser
 
 def home_view(request):
-    return render(request, 'home.html')
+    courses = Course.objects.filter(is_published=True).distinct()#all course data
+    #courses_categories = CourseCategory.objects.values_list('name', flat=True).distinct()
+    courses_categories = CourseCategory.objects.distinct()#all courses_categories data
+    #print("[courses]:", courses)
+    #print("[courses_categories]:", courses_categories)
+    instructors = CustomUser.objects.filter(is_instructor=True)
+
+    context = {
+        "courses": courses,
+        "coursetypes": courses_categories,
+        "instructors": instructors,
+    }
+    return render(request, 'home.html', context)
 
 def custom_login(request):
     if request.method == 'POST':
