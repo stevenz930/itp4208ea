@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-bg-dark">
+    <div class="container py-5">
+        <div class="row g-4">
+            <!-- Course Header Section -->
+            <div class="col-lg-8">
+                <div class="position-relative mb-4">
+                    <h1 class="display-4 fw-bold text-white mb-3">{{ course.title }}</h1>
+                    <span class="badge bg-info position-absolute top-0 end-0">Level: {{ course.level }}</span>
+                </div>
+
+                <!-- Course Meta Information -->
+                <div class="mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-primary me-2">{{ course.category.name }}</span>
+                        <div class="text-warning me-2">
+                            <span class="fw-bold">{{ course.average_rating }}</span>
+                            <small>({{ course.rating_count }} ratings)</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 text-light">
+                        <div>
+                            <i class="bi bi-person-circle me-2"></i>
+                            <span onclick="window.location.href='{% url 'instructor_detail' course.instructor.id %}';" style="cursor: pointer;">{{ course.instructor.get_full_name }}</span>
+                        </div>
+                        <div>
+                            <i class="bi bi-calendar me-2"></i>
+                            <span>Last updated: {{ course.updated_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                <div class="mb-4">
+                    <h6 class="text-info mb-2">Skills You'll Learn:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for skill in course.applications_covered.split %}
+                            <span class="badge bg-secondary">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Card -->
+            <div class="col-lg-4">
+                <div class="card shadow">
+                    {% if course.thumbnail %}
+                        <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="card-title h3 mb-0 text-decoration-line-through">${{ course.price }}</h2>
+                            <span class="badge bg-warning fs-5">FREE</span>
+                        </div>
+                        {% if is_enrolled %}
+                            <a href="#lessons" class="btn btn-success w-100 mb-2">Continue Learning</a>
+                        {% else %}
+                            <a href="#" class="btn btn-primary w-100 mb-2 text-decoration-line-through">Enroll Now</a>
+                            <a href="#" class="btn btn-outline-primary w-100 text-decoration-line-through">Add to Wishlist</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Course Description -->
+<section class="py-5 bg-light" id="description">
+    <div class="container">
+        <h2 class="h2 mb-4">About This Course</h2>
+        <div class="card">
+            <div class="card-body">
+                {{ course.description|linebreaks }}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Course Lessons -->
+<section class="py-5" id="lessons">
+    <div class="container">
+        <h2 class="h2 mb-4">Course Content</h2>
+        <div class="accordion" id="lessonsAccordion">
+            {% for lesson in lessons %}
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#lesson{{ lesson.id }}">
+                            {{ forloop.counter }}. {{ lesson.title }}
+                        </button>
+                    </h3>
+                    <div id="lesson{{ lesson.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                         data-bs-parent="#lessonsAccordion">
+                        <div class="accordion-body">
+                            <p>{{ lesson.content }}</p>
+                            {% if lesson.video_url %}
+                                <div class="ratio ratio-16x9 mt-3">
+                                    <iframe src="{{ lesson.video_url }}" allowfullscreen></iframe>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Reviews Section -->
+<section class="py-5 bg-light" id="reviews">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h2 mb-0">Student Reviews</h2>
+            {% if is_enrolled %}
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                    Write a Review
+                </button>
+            {% endif %}
+        </div>
+
+        {% if reviews %}
+            <div class="row g-4">
+                {% for review in reviews %}
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div>
+                                        <h5 class="card-title mb-1">{{ review.student.get_full_name }}</h5>
+                                        <div class="text-warning">
+                                            {% for i in review.rating|make_list %}
+                                                <i class="bi bi-star-fill"></i>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                <p class="card-text">{{ review.comment }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <p class="text-muted">No reviews yet. Be the first to review this course!</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{% if is_enrolled %}
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Write a Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'submit_review' course.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Add your review form here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
