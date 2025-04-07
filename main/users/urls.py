@@ -17,8 +17,7 @@ Including another URLconf
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from . import views
-from .views import home_view, profile, profile_settings ,privacy_policy,terms_of_service,refund_policy,faq
-
+from .views import home_view, profile, profile_settings, instructor_detail
 
 urlpatterns = [
     path('', home_view, name='home'),
@@ -28,10 +27,5 @@ urlpatterns = [
     # path('setup-profile/', setup_profile, name='setup_profile'),
     path('profile/',profile,name='profile'),
     path('settings/', profile_settings, name='profile_settings'),
-    path('search/', views.search_courses, name='search_courses'),
-    path('autocomplete/', views.autocomplete, name='autocomplete'),
-    path('privacy-policy/', privacy_policy, name='privacy_policy'),
-    path('terms-of-service/', views.terms_of_service, name='terms_of_service'),
-    path('refund-policy/', views.refund_policy, name='refund_policy'),
-    path('faq/', views.faq, name='faq'),
+    path('instructor/<int:instructor_id>/', instructor_detail, name='instructor_detail'),
 ]

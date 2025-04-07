@@ -20,15 +20,50 @@
                             <small>({{ course.rating_count }} ratings)</small>
                         </div>
                     </div>
-
-                    <div class="d-flex flex-wrap gap-3 text-light">
-                        <div>
-                            <i class="bi bi-person-circle me-2"></i>
-                            <span>{{ course.instructor.get_full_name }}</span>
-                        </div>
-                        <div>
-                            <i class="bi bi-calendar me-2"></i>
-                            <span>Last updated: {{ course.updated_at|date:"M d, Y" }}</span>
+                </p>
+                </div>
+                <div class="d-flex">
+                    <p class="me-2 fw-bold">Tags:</p>
+                    <p class="fs-6 text-secondary-emphasis fw-light text-light ">{{ item.applications_covered}}</p>
+                </div>
+                <div class="d-flex">
+                    <p class="fw-bold text-info">Created: </p>
+                    <p class="mx-2">{{ item.created_at }}</p>
+                    <p class="mx-2 fw-bold text-success">Last updated: </p>
+                    <p class="text-success">{{ item.updated_at }}</p>
+                </div>
+                <!--p class="">{{ item.is_published }}</p-->
+                <!--p class="">Instructor ID: {{ item.instructor_id }}</p-->
+                <div class="d-flex">
+                    <p class="me-2 fw-bold text-info">Instructor: </p>
+                    <p class="ms-2 " onclick="window.location.href='{% url 'instructor_detail' item.instructor.id %}';" style="cursor: pointer;">{{ item.instructor.first_name }} {{ item.instructor.last_name }}</p>
+                </div>
+                <!--p class="">Category ID: {{ item.category.id }}</!p-->
+                <div class="d-flex">
+                    <p class="me-2 fw-bold text-info">Category: </p>
+                    <p class="ms-2">{{ item.category.name }}</p>
+                </div>
+                <div class="d-flex">
+                    <p class="me-2 text-warning fw-bold">Rating: {{ item.average_rating }}</p>
+                    <p class="text-decoration-underline text-info">({{ item.rating_count }}) ratings</p>
+                </div>
+            </div>
+        
+            <div class="col mt-4 pt-4">
+                <div class="card w-75">
+                    <img src="{{ item.thumbnail.url }}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <p class="card-text fs-4 fw-bold">$ {{ item.price }}</p>
+                        <div class="d-flex flex-column">
+                            <!--
+                            <a href="#" class="btn btn-outline-primary my-1">Add to cart</a>
+                            <a href="#" class="btn btn-primary my-1">Buy now</a>
+                            -->
+                            <a href="#" class="btn btn-outline-primary my-1 text-decoration-line-through">Add to cart</a>
+                            <a href="#" class="btn btn-primary my-1">
+                                <div class="text-decoration-line-through">Buy now</div>
+                                <div class=" ">Free!</div>
+                            </a>
                         </div>
                     </div>
                 </div>
