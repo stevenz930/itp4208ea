@@ -2,14 +2,15 @@
 {% load course_extras %}
 
 {% block content %}
-<div class="text-bg-dark">
-    <div class="container py-5">
+<!-- Hero Section with Thumbnail Background -->
+<div class="position-relative" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), {% if course.thumbnail %}url('{{ course.thumbnail.url }}'){% else %}var(--bs-dark){% endif %}; background-size: cover; background-position: center; min-height: 400px;">
+    <div class="container py-5 position-relative" style="z-index: 1;">
         <div class="row g-4">
             <!-- Course Header Section -->
-            <div class="col-lg-8">
+            <div class="col-lg-8 text-white">
                 <div class="position-relative mb-4">
                     <h1 class="display-4 fw-bold text-white mb-3">{{ course.title }}</h1>
-                    <span class="badge bg-info position-absolute top-0 end-0">Level: {{ course.level }}</span>
+                    <span class="badge bg-info position-absolute top-0 end-0">Level: {{ course.get_level_display }}</span>
                 </div>
 
                 <!-- Course Meta Information -->
@@ -17,7 +18,7 @@
                     <div class="d-flex align-items-center mb-3">
                         <span class="badge bg-primary me-2">{{ course.category.name }}</span>
                         <div class="text-warning me-2">
-                            <span class="fw-bold">{{ course.average_rating }}</span>
+                            <span class="fw-bold">{{ course.average_rating|default:"0.0" }}</span>
                             <small>({{ course.rating_count }} ratings)</small>
                         </div>
                     </div>
@@ -45,12 +46,9 @@
                 </div>
             </div>
 
-            <!-- Course Card -->
+            <!-- Course Card (without thumbnail) -->
             <div class="col-lg-4">
-                <div class="card shadow">
-                    {% if course.thumbnail %}
-                        <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}">
-                    {% endif %}
+                <div class="card shadow bg-white">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h2 class="card-title h3 mb-0 text-decoration-line-through">${{ course.price }}</h2>
@@ -211,6 +209,14 @@
 </section>
 
 <style>
+    .card {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    .badge.bg-info {
+        background-color: #0dcaf0 !important;
+    }
+    
     .star_class{
         color: gold;
     }
