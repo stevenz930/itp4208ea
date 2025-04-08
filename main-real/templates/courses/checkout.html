@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Checkout</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Order Summary</h5>
+            <ul class="list-group mb-3">
+                {% for item in cart.items.all %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ item.course.title }}</span>
+                    <span>${{ item.course.price }}</span>
+                </li>
+                {% endfor %}
+                <li class="list-group-item d-flex justify-content-between font-weight-bold">
+                    <span>Total</span>
+                    <span>${{ cart.total_price }}</span>
+                </li>
+            </ul>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Email for receipt</label>
+                    <input type="email" class="form-control" value="{{ request.user.email }}" readonly>
+                </div>
+                
+                
+                <button type="submit" class="btn btn-primary btn-block">Complete Order</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

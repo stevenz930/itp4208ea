@@ -2,7 +2,7 @@
 {% load course_extras %}
 
 {% block content %}
-<!-- Hero Section with Thumbnail Background -->
+
 <div class="position-relative" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), {% if course.thumbnail %}url('{{ course.thumbnail.url }}'){% else %}var(--bs-dark){% endif %}; background-size: cover; background-position: center; min-height: 400px;">
     <div class="container py-5 position-relative" style="z-index: 1;">
         <div class="row g-4">
@@ -10,7 +10,7 @@
             <div class="col-lg-8 text-white">
                 <div class="position-relative mb-4">
                     <h1 class="display-4 fw-bold text-white mb-3">{{ course.title }}</h1>
-                    <span class="badge bg-info position-absolute top-0 end-0">Level: {{ course.get_level_display }}</span>
+                    <span class="badge bg-info ">Level: {{ course.get_level_display }}</span>
                 </div>
 
                 <!-- Course Meta Information -->
@@ -46,25 +46,32 @@
                 </div>
             </div>
 
-            <!-- Course Card (without thumbnail) -->
+            <!-- Course Card -->
             <div class="col-lg-4">
                 <div class="card shadow bg-white">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h2 class="card-title h3 mb-0 text-decoration-line-through">${{ course.price }}</h2>
+                            <h2 class="card-title h3 mb-0 ">${{ course.price }}</h2>
                             <span class="badge bg-warning fs-5">FREE</span>
                         </div>
                         {% if is_enrolled %}
                             <a href="#lessons" class="btn btn-success w-100 mb-2">Continue Learning</a>
                         {% else %}
-                            <form method="POST" action="{% url 'enroll_course' course.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-primary w-100 mb-2 text-decoration-line-through">
-                                    Enroll Now
-                                </button>
-                            </form>
-                            <a href="#" class="btn btn-outline-primary w-100 text-decoration-line-through">Add to Wishlist</a>
-                        {% endif %}
+                        
+                        <form method="POST" action="{% if user.is_authenticated %}{% url 'buy_now' course.id %}{% else %}{% url 'login' %}?next={% url 'buy_now' course.id %}{% endif %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary w-100 mb-2">
+                                Buy Now
+                            </button>
+                        </form>
+                        
+                        <form method="POST" action="{% if user.is_authenticated %}{% url 'add_to_cart' course.id %}{% else %}{% url 'login' %}?next={% url 'add_to_cart' course.id %}{% endif %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                Add to Cart
+                            </button>
+                        </form>
+                    {% endif %}
                     </div>
                 </div>
             </div>

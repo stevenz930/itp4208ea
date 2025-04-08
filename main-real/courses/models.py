@@ -36,7 +36,7 @@ class Tag(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return self.nam
+        return self.name
 
 class Course(models.Model):
     title = models.CharField(max_length=200)
@@ -152,18 +152,6 @@ class Enrollments(models.Model):
         return f"{self.student} enrolled in {self.course}"
 
 
-# class Section(models.Model):
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='sections')
-#     title = models.CharField(max_length=200)
-#     order = models.PositiveIntegerField()
-    
-#     class Meta:
-#         ordering = ['order']
-    
-#     def __str__(self):
-#         return f"{self.order}. {self.title}"
-
-
 class LessonProgress(models.Model):
     STATUS_CHOICES = [
         ('not_started', '未开始'), 
@@ -206,3 +194,78 @@ def get_rating_counts(self):
         '2': self.reviews.filter(rating=2).count(),
         '1': self.reviews.filter(rating=1).count()
     }
+
+class Cart(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='cart'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def total_price(self):
+        return sum(item.course.price for item in self.items.all())
+
+    def __str__(self):
+        return f"Cart for {self.user.username}"
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(
+        Cart,
+        related_name='items',
+        on_delete=models.CASCADE
+    )
+    course = models.ForeignKey(
+        'Course',
+        on_delete=models.CASCADE
+    )
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('cart', 'course')
+
+    def __str__(self):
+        return f"{self.course.title} in cart"
+
+class Order(models.Model):
+    ORDER_STATUS = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='orders'
+    )
+    order_number = models.CharField(max_length=20, unique=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(
+        max_length=10,
+        choices=ORDER_STATUS,
+        default='pending'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Order #{self.order_number}"
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        Order,
+        related_name='items',
+        on_delete=models.CASCADE
+    )
+    course = models.ForeignKey(
+        'Course',
+        on_delete=models.PROTECT
+    )
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.course.title} in order #{self.order.order_number}"

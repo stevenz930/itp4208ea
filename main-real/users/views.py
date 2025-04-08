@@ -1,6 +1,6 @@
 
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db.models import Q
 from .forms import CustomUserCreationForm, ProfileSettingsForm
@@ -82,7 +82,6 @@ def setup_profile(request):
 @login_required
 def profile_settings(request):
     if request.method == 'POST':
-       
         form = ProfileSettingsForm(
             data=request.POST,  
             files=request.FILES,  
@@ -90,7 +89,7 @@ def profile_settings(request):
         )
         if form.is_valid():
             form.save()
-            messages.success(request, 'Profile updated successfully!')
+            messages.success(request, 'Profile updated successfully!', extra_tags='profile_settings')
             return redirect('profile_settings')
     else:
         form = ProfileSettingsForm(instance=request.user)
