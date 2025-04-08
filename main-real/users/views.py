@@ -1,6 +1,6 @@
 
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db.models import Q
 from .forms import CustomUserCreationForm, ProfileSettingsForm
