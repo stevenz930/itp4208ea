@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% include 'include/home_caro.html'%}
+
+
+<div class="">
+  {% if user.is_authenticated %}
+    <h1>Welcome back, {{ user.username }}!</h1>
+    <p><a href="{#}">Password Change</a></p>
+    <form action="{% url 'logout' %}" method="post">
+      {% csrf_token %}
+      <button type="submit">Log Out</button>
+    </form>
+  {% endif %}
+
+  {% include 'include/home_cate.html'%}
+
+  {% include 'include/home_course_recommand.html' %}
+
+  {% include 'include/home_why.html'%}
+
+  {% include 'include/home_tes.html'%}
+
+  {% include 'include/home_instructor_recommand.html' %}
+  
+
+</div>
+{% endblock %}

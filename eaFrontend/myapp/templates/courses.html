@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<img src="https://picsum.photos/1920/1080" class="img-fluid">
+<p class="h1">COURSES</p>
+<p>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vel orci ex. Nam ut vulputate eros, et facilisis lorem. Vivamus ornare odio nisi, vitae egestas turpis auctor in. Duis sit amet dapibus lacus. Suspendisse potenti. Cras arcu velit, pulvinar ut ipsum sit amet, aliquam dignissim nibh. Aliquam tempus leo sit amet iaculis mollis. Vestibulum iaculis mauris erat, et feugiat arcu fringilla a.
+</p>
+
+<div class="d-flex justify-content-start flex-nowrap flex-shrink-0">
+    {% for course in courses %}
+        <div class="px-1 w-25">
+            <div class="card">
+                <img src="https://picsum.photos/900/600?random={{ course.id }}" class="card-img-top">
+                <div class="card-body">
+                    <p class="card-title h5 fw-bold">{{ course.title }}</p>
+                    <p class="card-subtitle text-body-tertiary fs-6">{{ course.lecturer.name }}</p>
+                    <p class="card-text h5 fw-bold mt-1">${{ course.price }}</p>
+                    <a href="#" class="btn btn-primary btn-sm">View more</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+<h2>Raw data</h2>
+{{ courses }}
+
+<p>1</p>
+<p>2</p>
+{% endblock %}

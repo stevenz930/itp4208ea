@@ -1,0 +1,19 @@
+{% include "include/css.html" %}
+{% include "include/js.html" %}
+{% include "include/nav.html" %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ITP4208-EA-Frontend</title>
+    </head>
+    <body>
+        <div class="container mt-5 pt-1 mx-0 px-0 mw-100">
+            {% block content %}{% endblock %}
+            
+            {% include "include/footer.html" %}
+        </div>
+    </body>
+</html>
