@@ -17,15 +17,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from users import views 
-
+from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static # Make sure this import works
 
 urlpatterns = [
     path('', views.home_view, name='home'),
+    path('login/', views.custom_login, name='login'),
+    path('signup/', views.signup, name='signup'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('admin/',admin.site.urls),
     path('users/', include('users.urls')),
     path('courses/', include('courses.urls')),
+    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
+    path('terms-of-service/', views.terms_of_service, name='terms_of_service'),
+    path('refund-policy/', views.refund_policy, name='refund_policy'),
+    path('faq/', views.faq, name='faq'),
     
 ]
 if settings.DEBUG:

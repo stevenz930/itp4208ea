@@ -106,7 +106,7 @@ def course_detail(request, course_id):
 
     course = get_object_or_404(Course, is_published=True, id=course_id)
     
-    # Efficiently fetch related data
+    
     lessons = Lesson.objects.filter(course=course).order_by('order')
     reviews = Review.objects.select_related('student').filter(course=course).order_by('-created_at')
     
@@ -181,7 +181,12 @@ def add_to_cart(request, course_id):
     return redirect('course_detail', course_id=course_id)
 
 def view_cart(request):
-    cart = get_object_or_404(Cart, user=request.user)
+    if not request.user.is_authenticated:
+        return redirect('login')
+    try:
+        cart = Cart.objects.get(user=request.user)
+    except Cart.DoesNotExist:
+        cart = Cart.objects.create(user=request.user)
     return render(request, 'courses/cart.html', {'cart': cart})
 
 def remove_from_cart(request, item_id):
@@ -190,11 +195,15 @@ def remove_from_cart(request, item_id):
     messages.success(request, 'Course removed from cart')
     return redirect('view_cart')
 
+
 def checkout(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+        
     cart = get_object_or_404(Cart, user=request.user)
     
     if request.method == 'POST':
-        # Generate random order number
+       
         order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
         
         # Create order
@@ -202,7 +211,7 @@ def checkout(request):
             user=request.user,
             order_number=order_number,
             total_amount=cart.total_price,
-            status='completed'  # Since this is a fake payment
+            status='completed'  
         )
         
         # Create order items
@@ -219,9 +228,6 @@ def checkout(request):
         
         # Clear the cart
         cart.items.all().delete()
-        
-        # Send confirmation email
-        send_order_confirmation(request.user, order)
         
         messages.success(request, 'Order completed successfully!')
         return redirect('order_confirmation', order_id=order.id)
@@ -245,19 +251,3 @@ def buy_now(request, course_id):
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'courses/order_confirmation.html', {'order': order})
-
-def send_order_confirmation(user, order):
-    subject = f"Your Learning Platform Order Confirmation - #{order.order_number}"
-    html_message = render_to_string('courses/emails/order_confirmation.html', {
-        'user': user,
-        'order': order
-    })
-    plain_message = strip_tags(html_message)
-    
-    send_mail(
-        subject,
-        plain_message,
-        'noreply@learningplatform.com',
-        [user.email],
-        html_message=html_message
-    )

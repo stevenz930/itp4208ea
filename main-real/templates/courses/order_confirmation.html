@@ -1,45 +1,85 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header bg-success text-white">
-            <h3>Order Confirmation</h3>
+<div class="container my-5">
+    <div class="card border-success shadow">
+        <div class="card-header bg-success text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="fas fa-check-circle me-2"></i>Order Confirmation</h3>
+                <span class="badge bg-light text-success fs-6">#{{ order.order_number }}</span>
+            </div>
         </div>
         <div class="card-body">
-            <div class="alert alert-success">
-                <h4 class="alert-heading">Thank you for your order!</h4>
-                <p>Your order #{{ order.order_number }} has been completed successfully.</p>
-                <p>A confirmation email has been sent to {{ request.user.email }}.</p>
+            <div class="alert alert-success bg-light-success border-0">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x text-success me-3"></i>
+                    <div>
+                        <h4 class="alert-heading">Thank you for your order!</h4>
+                        <p class="mb-0">Your order has been completed successfully.</p>
+                    </div>
+                </div>
             </div>
             
-            <h5>Order Details</h5>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Course</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in order.items.all %}
-                    <tr>
-                        <td>{{ item.course.title }}</td>
-                        <td>${{ item.price }}</td>
-                    </tr>
-                    {% endfor %}
-                    <tr class="table-active">
-                        <td><strong>Total</strong></td>
-                        <td><strong>${{ order.total_amount }}</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div class="mt-4">
-                <a href="{% url 'course_list' %}" class="btn btn-primary">Continue Learning</a>
-                <a href="{% url 'my_study' %}" class="btn btn-secondary">View My Courses</a>
+            <div class="row">
+                <div class="col-md-8">
+                    <h5 class="fw-bold mb-3">Order Details</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Instructor</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ item.course.thumbnail.url }}" alt="{{ item.course.title }}" 
+                                                 class="rounded me-2" width="40" height="30" style="object-fit: cover;">
+                                            <span>{{ item.course.title }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ item.course.instructor }}</td>
+                                    <td>${{ item.price }}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="table-active">
+                                    <td colspan="2"><strong>Total</strong></td>
+                                    <td><strong>${{ order.total_amount }}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3">What's Next?</h5>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'my_study' %}" class="btn btn-success">
+                                    <i class="fas fa-play-circle me-2"></i>Start Learning
+                                </a>
+                                <a href="{% url 'course_list' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-book-open me-2"></i>Browse More Courses
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .card-header {
+        border-radius: 0 !important;
+    }
+    .bg-light-success {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+</style>
 {% endblock %}

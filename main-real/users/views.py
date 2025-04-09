@@ -11,11 +11,9 @@ from users.models import CustomUser
 from django.http import JsonResponse
 
 def home_view(request):
-    courses = Course.objects.filter(is_published=True).distinct()#all course data
-    #courses_categories = CourseCategory.objects.values_list('name', flat=True).distinct()
-    courses_categories = CourseCategory.objects.distinct()#all courses_categories data
-    #print("[courses]:", courses)
-    #print("[courses_categories]:", courses_categories)
+    courses = Course.objects.filter(is_published=True).distinct()
+    
+    courses_categories = CourseCategory.objects.distinct()
     instructors = CustomUser.objects.filter(is_instructor=True)
 
     context = {

@@ -54,16 +54,13 @@ class Course(models.Model):
         on_delete=models.CASCADE,
         related_name='taught_courses'
     )
-    applications_covered = models.TextField( 
-        blank=True,
-        help_text="what app and tools will use,like Figma, Photoshop."
-    )
     LEVEL_CHOICES = [
         ('BG', 'Beginner'),
         ('IM', 'Intermediate'),
         ('AD', 'Advanced'),
     ]
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    is_free = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(default=False)
@@ -78,7 +75,7 @@ class Course(models.Model):
         total_seconds = sum(
             lesson.duration.total_seconds() 
             for lesson in self.lessons.all() 
-            if lesson.duration  # Only count lessons with duration set
+            if lesson.duration  
         )
         return round(total_seconds / 3600, 1)  # Convert seconds to hours
     
@@ -123,7 +120,7 @@ class Lesson(models.Model):
     content = models.TextField(blank=True)
     video_url = models.URLField(blank=True)
     duration = models.DurationField(blank=True, null=True)
-    is_free = models.BooleanField(default=False)
+    
 
     class Meta:
         ordering =['order']
@@ -154,9 +151,9 @@ class Enrollments(models.Model):
 
 class LessonProgress(models.Model):
     STATUS_CHOICES = [
-        ('not_started', '未开始'), 
-        ('started', '已开始'),
-        ('completed', '已完成')
+        ('not_started', 'Not started'), 
+        ('started', 'Started'),
+        ('completed', 'Completed')
     ]
     
     enrollment = models.ForeignKey(
