@@ -19,6 +19,7 @@ import os
 
 fake = Faker()
 User = get_user_model()
+
 class Command(BaseCommand):
     help = 'Generates complete test data with IT-themed images and proper ID reset'
 
@@ -29,7 +30,14 @@ class Command(BaseCommand):
         instructors = self.create_instructors(User)
         subcategories = self.create_subcategories(subjects)
         tags = self.create_tags(instructors)
-        courses = self.create_courses(subcategories, instructors, tags)
+        
+        # Phase 1: Create instructor-specific courses
+        instructor_courses = self.create_instructor_courses(subcategories, instructors, tags)
+        
+        # Phase 2: Create additional subject-specific courses
+        subject_courses = self.create_subject_courses(subcategories, instructors, tags)
+        
+        courses = instructor_courses + subject_courses
         self.create_students_and_enrollments(User, courses)
 
         print("\n=== Data Generation Complete ===")
@@ -299,9 +307,73 @@ class Command(BaseCommand):
         print(f"✔ Created {len(created)} programming-related tags")
         return created
 
-    def create_courses(self, subcategories, instructors, tags):
+    def create_instructor_courses(self, subcategories, instructors, tags):
+        """First phase: Create unique courses for each instructor"""
         courses = []
-        tech_keywords = {
+        used_titles = set()
+        
+        tech_keywords = self._get_tech_keywords()
+        course_templates = self._get_course_templates()
+        programming_languages = self._get_programming_languages()
+        lesson_topics = self._get_lesson_topics()
+        
+        for instructor in instructors:
+            for attempt in range(3):  # Try 3 times per instructor
+                subcat = random.choice(subcategories)
+                course = self._create_unique_course(
+                    subcat=subcat,
+                    instructor=instructor,
+                    tags=tags,
+                    tech_keywords=tech_keywords,
+                    course_templates=course_templates,
+                    programming_languages=programming_languages,
+                    lesson_topics=lesson_topics,
+                    used_titles=used_titles,
+                    is_instructor_course=True
+                )
+                if course:
+                    courses.append(course)
+                    used_titles.add(course.title.lower())
+                    break
+        
+        print(f"✔ Created {len(courses)} instructor-specific courses")
+        return courses
+
+    def create_subject_courses(self, subcategories, instructors, tags):
+        """Second phase: Create additional unique courses per subject"""
+        courses = []
+        used_titles = set()
+        
+        tech_keywords = self._get_tech_keywords()
+        course_templates = self._get_course_templates()
+        programming_languages = self._get_programming_languages()
+        lesson_topics = self._get_lesson_topics()
+        
+        for subcat in subcategories:
+            for _ in range(random.randint(1, 3)):
+                for attempt in range(3):  # Try 3 times per course
+                    instructor = random.choice(instructors)
+                    course = self._create_unique_course(
+                        subcat=subcat,
+                        instructor=instructor,
+                        tags=tags,
+                        tech_keywords=tech_keywords,
+                        course_templates=course_templates,
+                        programming_languages=programming_languages,
+                        lesson_topics=lesson_topics,
+                        used_titles=used_titles,
+                        is_instructor_course=False
+                    )
+                    if course:
+                        courses.append(course)
+                        used_titles.add(course.title.lower())
+                        break
+        
+        print(f"✔ Created {len(courses)} subject-specific courses")
+        return courses
+
+    def _get_tech_keywords(self):
+        return {
             "Data Science": "data,science,python,analysis,machine,learning",
             "Web Development": "web,development,javascript,html,css,frontend,backend",
             "Artificial Intelligence": "ai,machine,learning,neural,network",
@@ -310,7 +382,8 @@ class Command(BaseCommand):
             "Cloud Computing": "cloud,aws,azure,gcp,serverless",
         }
 
-        course_templates = [
+    def _get_course_templates(self):
+        return [
             "Mastering {topic} in {language}",
             "{topic} for {level} Developers",
             "The Complete {language} {topic} Guide",
@@ -323,246 +396,212 @@ class Command(BaseCommand):
             "Professional {topic} using {language}"
         ]
 
-        programming_languages = ["Python", "JavaScript", "Java", "C++", "Go", "Rust", "TypeScript"]
+    def _get_programming_languages(self):
+        return ["Python", "JavaScript", "Java", "C++", "Go", "Rust", "TypeScript"]
 
-        # First ensure each instructor has one course
-        for instructor in instructors:
-            subcat = random.choice(subcategories)
-            theme = tech_keywords.get(subcat.subject.name, "technology,education")
+    def _get_lesson_topics(self):
+        return [
+            "Introduction to {topic}",
+            "{language} Basics",
+            "Core Concepts",
+            "Advanced Techniques",
+            "Practical Examples",
+            "Performance Optimization",
+            "Debugging and Testing",
+            "Real-world Applications",
+            "Case Studies",
+            "Final Project"
+        ]
+
+    def _create_unique_course(self, subcat, instructor, tags, tech_keywords, 
+                            course_templates, programming_languages, lesson_topics,
+                            used_titles, is_instructor_course):
+        """Core method to create a guaranteed unique course"""
+        theme = tech_keywords.get(subcat.subject.name, "technology,education")
+        topic = subcat.name.split()[0]
+        language = random.choice(programming_languages)
+        
+        # Generate 5 potential unique titles
+        potential_titles = self._generate_potential_titles(
+            subcat, course_templates, programming_languages, topic, used_titles
+        )
+        
+        # Find first unique title
+        course_title = None
+        for title in potential_titles:
+            if title.lower() not in used_titles:
+                course_title = title
+                break
+        
+        # Final fallback if all titles exist
+        if not course_title:
+            course_title = f"{potential_titles[0]} - {uuid.uuid4().hex[:4]}"
+        
+        # Create course with guaranteed unique title
+        try:
+            course = self._create_course_instance(
+                course_title=course_title,
+                subcat=subcat,
+                instructor=instructor,
+                topic=topic,
+                language=language,
+                is_instructor_course=is_instructor_course
+            )
             
-            template = random.choice(course_templates)
-            topic = subcat.name.split()[0]
-            language = random.choice(programming_languages)
-            level = random.choice(['Beginner', 'Intermediate', 'Advanced'])
+            # Set thumbnail and tags
+            self._set_course_thumbnail(course, theme, language)
+            self._set_course_tags(course, tags, language)
             
-            course_title = template.format(
+            # Create lessons
+            self._create_course_lessons(
+                course=course,
+                lesson_topics=lesson_topics,
+                topic=topic,
+                language=language
+            )
+            
+            return course
+            
+        except IntegrityError:
+            return None
+
+    def _generate_potential_titles(self, subcat, templates, languages, topic, used_titles):
+        """Generate 5 potential unique title variations"""
+        variations = []
+        base_template = random.choice(templates)
+        language = random.choice(languages)
+        level = random.choice(['Beginner', 'Intermediate', 'Advanced'])
+        
+        specializations = {
+            "Data Science": ["for Healthcare", "with Big Data", "using TensorFlow"],
+            "Web Development": ["with React", "using Node.js", "for E-commerce"],
+            "AI": ["for Computer Vision", "with NLP", "in Robotics"],
+            "Cybersecurity": ["for Cloud", "with Kali Linux", "for Web Apps"],
+            "Mobile": ["with Flutter", "using SwiftUI", "Cross-platform"],
+            "Cloud": ["with AWS", "using Kubernetes", "for DevOps"]
+        }
+        
+        # Variation 1: Base template
+        variations.append(base_template.format(
+            topic=topic,
+            language=language,
+            level=level
+        ))
+        
+        # Variation 2: With specialization
+        specialization = random.choice(specializations.get(subcat.subject.name, [""]))
+        if specialization:
+            variations.append(f"{base_template.format(
                 topic=topic,
                 language=language,
                 level=level
-            )
+            )}: {specialization}")
+        
+        # Variation 3: With year
+        variations.append(f"{base_template.format(
+            topic=topic,
+            language=language,
+            level=level
+        )} ({random.choice(['2024', '2025'])})")
+        
+        # Variation 4: With specialization and year
+        if specialization:
+            variations.append(f"{base_template.format(
+                topic=topic,
+                language=language,
+                level=level
+            )}: {specialization} ({random.choice(['2024', '2025'])})")
+        
+        # Variation 5: Random edition
+        variations.append(f"{base_template.format(
+            topic=topic,
+            language=language,
+            level=level
+        )} - {fake.word().title()} Edition")
+        
+        return variations
 
-            # Generate detailed description
-            description_intro = [
-                f"This comprehensive course will teach you {topic.lower()} using {language}.",
-                f"Master the art of {topic.lower()} with this {language}-based course.",
-                f"A complete guide to {topic.lower()} implementation in {language}.",
-                f"Learn professional {topic.lower()} techniques with {language}."
-            ]
-            
-            description_features = [
-                "\n\nWhat you'll learn:\n"
-                "- Core concepts and fundamentals\n"
-                "- Practical real-world applications\n"
-                "- Best practices and design patterns\n"
-                "- Performance optimization techniques\n"
-                "- Common pitfalls to avoid",
-                
-                "\n\nCourse highlights:\n"
-                "- Hands-on coding exercises\n"
-                "- Real-world project examples\n"
-                "- Quizzes and assessments\n"
-                "- Downloadable resources\n"
-                "- Certificate of completion",
-                
-                "\n\nSkills you'll gain:\n"
-                f"- {language} programming\n"
-                f"- {topic} implementation\n"
-                "- Problem solving\n"
-                "- Debugging techniques\n"
-                "- Code optimization"
-            ]
-            
-            full_description = random.choice(description_intro) + random.choice(description_features)
-            
-            # Determine if course is free (20% chance)
-            is_free = random.random() < 0.2
-            price = 0 if is_free else random.choice([19.99, 29.99, 39.99, 49.99, 79.99, 99.99])
-            
-            course = Course.objects.create(
-                title=course_title,
-                description=full_description,
-                category=subcat,
-                instructor=instructor,
-                price=price,
-                is_free=is_free,
-                level=random.choice(['BG', 'IM', 'AD']),
-                is_published=True,
-                thumbnail=''
-            )
-            
-            # Download and set thumbnail
-            thumbnail_url = f"https://source.unsplash.com/800x450/?{theme},{language.lower()}"
-            self.download_image(thumbnail_url, course.thumbnail)
-            
-            # Add tags - include the programming language and relevant tags
-            selected_tags = [t for t in tags if t.name == language]
-            other_tags = [t for t in tags if t.name != language]
-            
-            if other_tags:
-                selected_tags.extend(random.sample(other_tags, k=min(3, len(other_tags))))
-            
-            course.tags.set(selected_tags)
-            
-            # Create lessons
-            total_minutes = 0
-            for lesson_num in range(1, random.randint(5, 10)):
-                lesson_duration = random.randint(15, 90)
-                lesson_title = f"Module {lesson_num}: "
-                
-                lesson_topics = [
-                    f"Introduction to {topic}",
-                    f"{language} Basics",
-                    "Core Concepts",
-                    "Advanced Techniques",
-                    "Practical Examples",
-                    "Performance Optimization",
-                    "Debugging and Testing",
-                    "Real-world Applications",
-                    "Case Studies",
-                    "Final Project"
-                ]
-                
-                lesson_title += random.choice(lesson_topics)
-                
-                lesson_content = "\n\n".join([fake.paragraph() for _ in range(random.randint(3, 7))])
-                
-                Lesson.objects.create(
-                    course=course,
-                    title=lesson_title,
-                    order=lesson_num,
-                    content=lesson_content,
-                    video_url=f"https://lectures.school/{slugify(course.title)}-{lesson_num}",
-                    duration=timedelta(minutes=lesson_duration),
-                )
-                total_minutes += lesson_duration
-            
-            # Update course duration (convert minutes to hours)
-            course.duration = round(total_minutes / 60, 1)  # Convert to hours with 1 decimal
-            course.save()
-            
-            courses.append(course)
+    def _create_course_instance(self, course_title, subcat, instructor, topic, language, is_instructor_course):
+        """Create the actual Course instance"""
+        description_intro = random.choice([
+            f"This comprehensive course will teach you {topic.lower()} using {language}.",
+            f"Master the art of {topic.lower()} with this {language}-based course.",
+            f"A complete guide to {topic.lower()} implementation in {language}.",
+            f"Learn professional {topic.lower()} techniques with {language}."
+        ])
+        
+        description_features = random.choice([
+            "\n\nWhat you'll learn:\n- Core concepts\n- Practical applications\n- Best practices",
+            "\n\nCourse highlights:\n- Hands-on exercises\n- Real-world examples\n- Certificate",
+            "\n\nSkills you'll gain:\n- {language} programming\n- {topic} implementation"
+        ]).format(language=language, topic=topic)
+        
+        is_free = random.random() < 0.1 if is_instructor_course else random.random() < 0.3
+        price = 0 if is_free else random.choice([19.99, 29.99, 39.99, 49.99, 79.99, 99.99])
+        
+        return Course.objects.create(
+            title=course_title,
+            description=description_intro + description_features,
+            category=subcat,
+            instructor=instructor,
+            price=price,
+            is_free=is_free,
+            level=random.choice(['BG', 'IM', 'AD']),
+            is_published=True,
+            thumbnail=''
+        )
 
-        # Then create additional random courses for each subcategory
-        for subcat in subcategories:
-            # Create 1-3 additional courses per subcategory
-            for _ in range(random.randint(1, 3)):
-                instructor = random.choice(instructors)
-                theme = tech_keywords.get(subcat.subject.name, "technology,education")
-                
-                template = random.choice(course_templates)
-                topic = subcat.name.split()[0]
-                language = random.choice(programming_languages)
-                level = random.choice(['Beginner', 'Intermediate', 'Advanced'])
-                
-                course_title = template.format(
+    def _set_course_thumbnail(self, course, theme, language):
+        """Download and set unique thumbnail"""
+        thumbnail_url = (
+            f"https://source.unsplash.com/800x450/?{theme},"
+            f"{language.lower()},{random.randint(1,10000)}"
+        )
+        self.download_image(thumbnail_url, course.thumbnail)
+
+    def _set_course_tags(self, course, tags, language):
+        """Assign unique combination of tags"""
+        selected_tags = [t for t in tags if t.name == language]
+        other_tags = [t for t in tags if t.name != language]
+        random.shuffle(other_tags)
+        selected_tags.extend(other_tags[:min(3, len(other_tags))])
+        course.tags.set(selected_tags)
+
+    def _create_course_lessons(self, course, lesson_topics, topic, language):
+        """Create unique lessons for the course"""
+        total_minutes = 0
+        num_lessons = random.randint(5, 10)
+        used_lesson_titles = set()
+        
+        for lesson_num in range(1, num_lessons + 1):
+            lesson_duration = random.randint(15, 90)
+            
+            # Generate unique lesson title
+            for _ in range(3):
+                current_topic = random.choice(lesson_topics).format(
                     topic=topic,
-                    language=language,
-                    level=level
+                    language=language
                 )
-
-                # Generate detailed description
-                description_intro = [
-                    f"This comprehensive course will teach you {topic.lower()} using {language}.",
-                    f"Master the art of {topic.lower()} with this {language}-based course.",
-                    f"A complete guide to {topic.lower()} implementation in {language}.",
-                    f"Learn professional {topic.lower()} techniques with {language}."
-                ]
-                
-                description_features = [
-                    "\n\nWhat you'll learn:\n"
-                    "- Core concepts and fundamentals\n"
-                    "- Practical real-world applications\n"
-                    "- Best practices and design patterns\n"
-                    "- Performance optimization techniques\n"
-                    "- Common pitfalls to avoid",
-                    
-                    "\n\nCourse highlights:\n"
-                    "- Hands-on coding exercises\n"
-                    "- Real-world project examples\n"
-                    "- Quizzes and assessments\n"
-                    "- Downloadable resources\n"
-                    "- Certificate of completion",
-                    
-                    "\n\nSkills you'll gain:\n"
-                    f"- {language} programming\n"
-                    f"- {topic} implementation\n"
-                    "- Problem solving\n"
-                    "- Debugging techniques\n"
-                    "- Code optimization"
-                ]
-                
-                full_description = random.choice(description_intro) + random.choice(description_features)
-                
-                # Determine if course is free (20% chance)
-                is_free = random.random() < 0.2
-                price = 0 if is_free else random.choice([19.99, 29.99, 39.99, 49.99, 79.99, 99.99])
-                
-                course = Course.objects.create(
-                    title=course_title,
-                    description=full_description,
-                    category=subcat,
-                    instructor=instructor,
-                    price=price,
-                    is_free=is_free,
-                    level=random.choice(['BG', 'IM', 'AD']),
-                    is_published=True,
-                    thumbnail=''
-                )
-                
-                # Download and set thumbnail
-                thumbnail_url = f"https://source.unsplash.com/800x450/?{theme},{language.lower()}"
-                self.download_image(thumbnail_url, course.thumbnail)
-                
-                # Add tags - include the programming language and relevant tags
-                selected_tags = [t for t in tags if t.name == language]
-                other_tags = [t for t in tags if t.name != language]
-                
-                if other_tags:
-                    selected_tags.extend(random.sample(other_tags, k=min(3, len(other_tags))))
-                
-                course.tags.set(selected_tags)
-                
-                # Create lessons
-                total_minutes = 0
-                for lesson_num in range(1, random.randint(5, 10)):
-                    lesson_duration = random.randint(15, 90)
-                    lesson_title = f"Module {lesson_num}: "
-                    
-                    lesson_topics = [
-                        f"Introduction to {topic}",
-                        f"{language} Basics",
-                        "Core Concepts",
-                        "Advanced Techniques",
-                        "Practical Examples",
-                        "Performance Optimization",
-                        "Debugging and Testing",
-                        "Real-world Applications",
-                        "Case Studies",
-                        "Final Project"
-                    ]
-                    
-                    lesson_title += random.choice(lesson_topics)
-                    
-                    lesson_content = "\n\n".join([fake.paragraph() for _ in range(random.randint(3, 7))])
-                    
-                    Lesson.objects.create(
-                        course=course,
-                        title=lesson_title,
-                        order=lesson_num,
-                        content=lesson_content,
-                        video_url=f"https://lectures.school/{slugify(course.title)}-{lesson_num}",
-                        duration=timedelta(minutes=lesson_duration),
-                    )
-                    total_minutes += lesson_duration
-                
-                # Update course duration (convert minutes to hours)
-                course.duration = round(total_minutes / 60, 1)  # Convert to hours with 1 decimal
-                course.save()
-                
-                courses.append(course)
-
-        print(f"✔ Created {len(courses)} courses with lessons")
-        return courses
+                lesson_title = f"Module {lesson_num}: {current_topic}"
+                if lesson_title not in used_lesson_titles:
+                    used_lesson_titles.add(lesson_title)
+                    break
+            
+            Lesson.objects.create(
+                course=course,
+                title=lesson_title,
+                order=lesson_num,
+                content="\n\n".join([fake.paragraph() for _ in range(3, 7)]),
+                video_url=(
+                    f"https://lectures.school/{slugify(course.title)}-"
+                    f"{lesson_num}-{uuid.uuid4().hex[:6]}"
+                ),
+                duration=timedelta(minutes=lesson_duration),
+            )
+            total_minutes += lesson_duration
+        
+        course.duration = round(total_minutes / 60, 1)
+        course.save()
 
     def _enroll_and_review(self, user, courses, review_comments):
         try:

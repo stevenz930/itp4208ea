@@ -94,7 +94,7 @@ class Course(models.Model):
 class Review(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='reviews')
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])  # 1-5 stars
+    rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])  
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)    
 

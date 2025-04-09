@@ -4,12 +4,78 @@
 {% block content %}
 
 <style>
+    a:hover{
+        text-decoration: none;
+    }
+    .card {
+        border-radius: 0.5rem;
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .text-warning {
+        color: #ffc107 !important;
+    }
+    .text-warning i {
+        font-size: 0.875rem;
+    }
+
     .accordion-button:disabled {
         background-color: #f8f9fa;
         color: #6c757d;
     }
     .accordion-button:disabled::after {
-        display: none; /* Remove the accordion arrow */
+        display: none; /
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(0,0,0,.125);
+    }
+    .accordion-button:not(.collapsed)::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+    .accordion-button.collapsed:disabled {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+    .accordion-button.collapsed:disabled::after {
+        display: none;
+    }
+
+    @media (max-width: 768) {
+        #reviews .display-4 {
+            font-size: 2.5rem;
+        }
+        #reviews .rating-bar {
+            font-size: 0.9rem;
+        }
+
+        #reviews .card {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+
+        #reviews .row.g-0 > div:first-child .card {
+            border-top-left-radius: 0.5rem !important;
+            border-top-right-radius: 0.5rem !important;
+        }
+
+        #reviews .row.g-0 > div:last-child .card {
+            border-bottom-left-radius: 0.5rem !important;
+            border-bottom-right-radius: 0.5rem !important;
+        }
+    }
+
+    @media (min-width: 768px) {
+        #reviews .shadow-none.shadow-md-sm {
+            box-shadow: var(--bs-box-shadow-sm) !important;
+        }
     }
 </style>
 <div class="position-relative" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), {% if course.thumbnail %}url('{{ course.thumbnail.url }}'){% else %}var(--bs-dark){% endif %}; background-size: cover; background-position: center; min-height: 400px;">
@@ -18,20 +84,27 @@
             <!-- Course Header Section -->
             <div class="col-lg-8 text-white">
                 <div class="position-relative mb-4">
-                    <h1 class="display-4 fw-bold text-white mb-3">{{ course.title }}</h1>
+                    <h1 class="display-5 fw-bold text-white mb-3">{{ course.title }}</h1>
                     <span class="badge bg-info ">Level: {{ course.get_level_display }}</span>
+                    <span class="badge bg-primary me-2">{{ course.category.name }}</span>
                 </div>
 
                 <!-- Course Meta Information -->
                 <div class="mb-4">
                     <div class="d-flex align-items-center mb-3">
-                        <span class="badge bg-primary me-2">{{ course.category.name }}</span>
+                        <a href="#reviews">
                         <div class="text-warning me-2">
-                            <span class="fw-bold">{{ course.average_rating|default:"0.0" }}</span>
-                            <small>({{ course.rating_count }} ratings)</small>
+                            <span class="fw-bold">{{ course.average_rating|floatformat:1 }}</span>
+                            <span class="rating-stars ms-1">
+                                {% for star_class in course.average_rating|show_stars %}
+                                    <i class="{{ star_class }}"></i>
+                                {% endfor %}
+                            </span>
+                            <small class="text-warning ">({{ course.rating_count }} reviews)</small>
                         </div>
+                        </a>
                     </div>
-
+                
                     <div class="d-flex flex-wrap gap-3 text-light">
                         <div>
                             <i class="bi bi-person-circle me-2"></i>
@@ -56,31 +129,48 @@
             </div>
 
             <!-- Course Card -->
-            <div class="col-lg-4">
-                <div class="card shadow bg-white">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h2 class="card-title h3 mb-0 ">${{ course.price }}</h2>
-                            <span class="badge bg-warning fs-5">FREE</span>
+                    <div class="col-lg-4">
+                        <div class="card shadow bg-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    {% if course.is_free %}
+                                        <h2 class="card-title h3 mb-0">
+                                            <span class="badge bg-warning fs-4">FREE</span>
+                                        </h2>
+                                    {% else %}
+                                        <h2 class="card-title h3 mb-0">${{ course.price }}</h2>
+                                    {% endif %}
+                                </div>
+                                {% if is_enrolled %}
+                                    <a href="#lessons" class="btn btn-success w-100 mb-2">
+                                        <i class="fas fa-play-circle me-2"></i>Continue Learning
+                                    </a>
+                                {% else %}
+                                    {% if course.is_free %}
+                                        <form method="POST" action="{% url 'enroll_course' course.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="fas fa-plus-circle me-2"></i>Add to Study List
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST" action="{% if user.is_authenticated %}{% url 'buy_now' course.id %}{% else %}{% url 'login' %}?next={% url 'buy_now' course.id %}{% endif %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-primary w-100 mb-2">
+                                                Buy Now
+                                            </button>
+                                        </form>
+                                        
+                                        <form method="POST" action="{% if user.is_authenticated %}{% url 'add_to_cart' course.id %}{% else %}{% url 'login' %}?next={% url 'add_to_cart' course.id %}{% endif %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-primary w-100">
+                                                Add to Cart
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
                         </div>
-                        {% if is_enrolled %}
-                            <a href="#lessons" class="btn btn-success w-100 mb-2">Continue Learning</a>
-                        {% else %}
-                        
-                        <form method="POST" action="{% if user.is_authenticated %}{% url 'buy_now' course.id %}{% else %}{% url 'login' %}?next={% url 'buy_now' course.id %}{% endif %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary w-100 mb-2">
-                                Buy Now
-                            </button>
-                        </form>
-                        
-                        <form method="POST" action="{% if user.is_authenticated %}{% url 'add_to_cart' course.id %}{% else %}{% url 'login' %}?next={% url 'add_to_cart' course.id %}{% endif %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-primary w-100">
-                                Add to Cart
-                            </button>
-                        </form>
-                    {% endif %}
                     </div>
                 </div>
             </div>
@@ -107,25 +197,27 @@
             {% for lesson in lessons %}
                 <div class="accordion-item">
                     <h3 class="accordion-header">
-                        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
+                        <button class="accordion-button collapsed" 
                                 type="button" 
-                                {% if not is_enrolled and not forloop.first %}disabled{% endif %}
-                                {% if is_enrolled or forloop.first %}
+                                {% if not is_enrolled and not course.is_free and not forloop.first %}disabled{% endif %}
+                                {% if is_enrolled or course.is_free or forloop.first %}
                                     data-bs-toggle="collapse" 
                                     data-bs-target="#lesson{{ lesson.id }}"
                                 {% endif %}>
-                             {{ lesson.title }}
-                            {% if not is_enrolled and not forloop.first %}
-                                <span class="ms-2 badge bg-secondary">Locked</span>
-                            {% endif %}
+                            <div class="d-flex align-items-center justify-content-between w-100">
+                                <span>{{ lesson.title }}</span>
+                                {% if not is_enrolled and not course.is_free and not forloop.first %}
+                                    <span class="ms-2 badge bg-secondary">Locked</span>
+                                {% endif %}
+                            </div>
                         </button>
                     </h3>
                     
-                    {% if is_enrolled or forloop.first %}
-                    <div id="lesson{{ lesson.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                    {% if is_enrolled or course.is_free or forloop.first %}
+                    <div id="lesson{{ lesson.id }}" class="accordion-collapse collapse" 
                          data-bs-parent="#lessonsAccordion">
                         <div class="accordion-body">
-                            {% if forloop.first and not is_enrolled %}
+                            {% if forloop.first and not is_enrolled and not course.is_free %}
                                 <div class="alert alert-info">
                                     <p>Buy the course to access all lessons</p>
                                     <a href="{% url 'checkout' %}?course_id={{ course.id }}" class="btn btn-primary">
@@ -148,7 +240,6 @@
     </div>
 </section>
 
-
 <!-- Reviews Section -->
 <section class="py-5 bg-light" id="reviews">
     <div class="container">
@@ -168,9 +259,9 @@
             <div class="col-12 col-md-4 pe-md-0">
                 <div class="card border-0 bg-white shadow-none shadow-md-sm p-3 p-md-4 h-100 rounded-top rounded-md-start rounded-md-end-0">
                     <div class="text-center">
-                        <h1 class="display-4 fw-bold  mb-0">{{ course.average_rating|default:0|floatformat:1 }}</h1>
+                        <h1 class="display-4 fw-bold mb-0">{{ course.average_rating|floatformat:1 }}</h1>
                         <div class="text-warning mb-2" style="font-size: 1.5rem;">
-                            {% with stars=course.average_rating|default:0|show_stars %}
+                            {% with stars=course.average_rating|show_stars %}
                                 {% for star_class in stars %}
                                     <i class="{{ star_class }}"></i>
                                 {% endfor %}
@@ -209,26 +300,46 @@
             </div>
         </div>
 
+        
         {% if reviews %}
             <div class="row g-4">
                 {% for review in reviews %}
                     <div class="col-12 col-md-6">
                         <div class="card h-100">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between mb-3">
-                                    <div>
-                                        <h5 class="card-title mb-1">{{ review.student.get_full_name }}</h5>
-                                        <div class="text-warning">
-                                            {% for i in "12345"|make_list %}
-                                                {% if forloop.counter <= review.rating %}
-                                                    <i class="fas fa-star"></i>
-                                                {% else %}
-                                                    <i class="far fa-star"></i>
-                                                {% endif %}
-                                            {% endfor %}
+                                <div class="d-flex mb-3">
+                                    <div class="flex-shrink-0">
+                                        <a href="#" class="text-decoration-none">
+                                            <img src="{{ review.student.avatar.url }}" 
+                                                 class="rounded-circle"
+                                                 alt="{{ review.student.get_full_name }}"
+                                                 width="48" height="48"
+                                                 style="object-fit: cover;">
+                                        </a>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5 class="card-title mb-1">
+                                                  
+                                                        {{ review.student.get_full_name }}
+                                      
+                                                </h5>
+                                                <div class="text-warning mb-1">
+                                                    {% for i in "12345"|make_list %}
+                                                        {% if forloop.counter <= review.rating %}
+                                                            <i class="fas fa-star"></i>
+                                                        {% else %}
+                                                            <i class="far fa-star"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">
+                                                {{ review.created_at|relative_time }}
+                                            </small>
                                         </div>
                                     </div>
-                                    <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
                                 </div>
                                 <p class="card-text">{{ review.comment }}</p>
                             </div>
@@ -245,46 +356,7 @@
 </section>
 
 <style>
-    .card {
-        border-radius: 0.5rem;
-        overflow: hidden;
-    }
-    .badge.bg-info {
-        background-color: #0dcaf0 !important;
-    }
     
-    .star_class{
-        color: gold;
-    }
-    @media (max-width: 768) {
-        #reviews .display-4 {
-            font-size: 2.5rem;
-        }
-        #reviews .rating-bar {
-            font-size: 0.9rem;
-        }
-
-        #reviews .card {
-            box-shadow: none !important;
-            border-radius: 0 !important;
-        }
-
-        #reviews .row.g-0 > div:first-child .card {
-            border-top-left-radius: 0.5rem !important;
-            border-top-right-radius: 0.5rem !important;
-        }
-
-        #reviews .row.g-0 > div:last-child .card {
-            border-bottom-left-radius: 0.5rem !important;
-            border-bottom-right-radius: 0.5rem !important;
-        }
-    }
-
-    @media (min-width: 768px) {
-        #reviews .shadow-none.shadow-md-sm {
-            box-shadow: var(--bs-box-shadow-sm) !important;
-        }
-    }
 </style>
 
 {% endblock %}

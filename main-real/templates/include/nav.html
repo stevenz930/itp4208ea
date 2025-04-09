@@ -35,32 +35,22 @@
         {% if user.is_authenticated %}
           <!-- 登入後顯示的圖標 -->
           <div class="d-flex">
-            {% comment %} <!-- 通知 -->
-            <a href="/notifications" class="btn btn-link text-dark position-relative mx-2" title="Notifications">
-              <i class="fas fa-bell fs-5"></i>
-              <!-- <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                3
-              </span>
-            </a> --> {% endcomment %}
-  
-          <!-- 購物車 -->
-<a href="{% url 'view_cart' %}" class="btn btn-link text-dark position-relative mx-2" title="Cart">
-  <i class="fas fa-shopping-cart fs-5"></i>
-  {% with cart_items=user.cart.items.count %}
-    {% if cart_items > 0 %}
-      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-        {{ cart_items }}
-      </span>
-    {% endif %}
-  {% endwith %}
-</a>
-
-       
+            <!-- 購物車 -->
+            <a href="{% url 'view_cart' %}" class="btn btn-link text-dark position-relative mx-2" title="Cart">
+              <i class="fas fa-shopping-cart fs-5"></i>
+              {% with cart_items=user.cart.items.count %}
+                {% if cart_items > 0 %}
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                    {{ cart_items }}
+                  </span>
+                {% endif %}
+              {% endwith %}
+            </a>
   
             <!-- 用戶下拉選單 -->
             <div class="dropdown">
               <a class="btn btn-link text-dark dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user" ></i>
+                <i class="fas fa-user"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                 <li><a class="dropdown-item" href="{% url 'my_study' %}"><i class="fa-solid fa-bookmark me-2"></i>Study</a></li>
@@ -73,6 +63,7 @@
                       <i class="fas fa-sign-out-alt me-2"></i>Logout
                     </button>
                   </form>
+                </li>
               </ul>
             </div>
           </div>
@@ -81,13 +72,8 @@
           <div class="d-flex">
             <a href="{% url 'login' %}" class="btn btn-outline-secondary mx-2">Login</a>
             <a href="{% url 'signup' %}" class="btn btn-dark mx-2">Sign Up</a>
-            
           </div>
         {% endif %}
       </div>
     </div>
-  </nav>
-          </div>
-          </div>
-        </div>
-      </nav> 
+</nav>

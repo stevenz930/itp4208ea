@@ -1,4 +1,3 @@
-// main/static/js/autocomplete.js
 document.addEventListener('DOMContentLoaded', function() {
     const searchBars = document.querySelectorAll('.search-bar');
     

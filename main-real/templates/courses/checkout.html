@@ -1,6 +1,36 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+   
+    @media (max-width: 992px) {
+        .container-fluid.px-lg-5 {
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+        }
+    }
+    @media (max-width: 992px) {
+        .container-fluid {
+            margin-bottom: 2rem;
+        }
+    }
+    .card {
+        margin-bottom: 1rem;
+    }
+    .payment-method-icon {
+        width: 30px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .payment-method-icon img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+</style>
+
 <div class="d-flex flex-column min-vh-100">
     <div class="container-fluid px-lg-5 flex-grow-1 py-4 py-lg-5">
         <div class="d-flex justify-content-between align-items-center mb-4 mb-lg-5">
@@ -15,27 +45,78 @@
                 <div class="card shadow-sm border-0 rounded-4 mb-4">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-4">Payment Details</h5>
-                        <form method="post">
+                        <form method="post" id="paymentForm">
                             {% csrf_token %}
                             <div class="mb-4">
                                 <label class="form-label">Payment Method</label>
                                 <div class="border rounded p-3 bg-light">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" checked>
-                                        <label class="form-check-label" for="creditCard">
-                                            <i class="fab fa-cc-visa me-2"></i>Credit Card
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="credit_card" checked>
+                                        <label class="form-check-label d-flex align-items-center" for="creditCard">
+                                            <div class="payment-method-icon me-2">
+                                                <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" alt="Credit Card" width="30">
+                                            </div>
+                                            Credit Card
+                                            
                                         </label>
                                     </div>
-                                    <div class="form-check mt-2">
-                                        <input class="form-check-input" type="radio" name="paymentMethod" id="paypal">
-                                        <label class="form-check-label" for="paypal">
-                                            <i class="fab fa-cc-paypal me-2"></i>PayPal
+                                    
+                                    <!-- Credit Card Fields -->
+                                    <div id="creditCardFields" class="mt-3 ps-4">
+                                        <div class="d-flex gap-2 mt-2 me-auto">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" alt="Visa" width="40">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" alt="Mastercard" width="40">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/196/196561.png" alt="Amex" width="40">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="cardNumber" class="form-label">Card Number</label>
+                                            <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="0000 0000 0000 0000 pattern="\d{4} \d{4} \d{4} \d{4}" required>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="expiryDate" class="form-label">Expiry Date</label>
+                                                <input type="text" class="form-control" id="expiryDate" name="expiryDate" placeholder="MM/YY" pattern="\d{2}/\d{2}" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="cvv" class="form-label">CVV</label>
+                                                <input type="text" class="form-control" id="cvv" name="cvv" placeholder="000" pattern="\d{3}" required>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <label for="cardName" class="form-label">Name on Card</label>
+                                            <input type="text" class="form-control" id="cardName" name="cardName" placeholder="" required>
+                                        </div>
+                                        
+                                    </div>
+
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal">
+                                        <label class="form-check-label d-flex gap-2 mt-2" for="paypal">
+                                            <div class="payment-method-icon me-2">
+                                                <img src="https://cdn-icons-png.flaticon.com/512/174/174861.png" alt="PayPal" width="30">
+                                            </div>
+                                            PayPal
+                                            
                                         </label>
+                                    </div>
+                                    
+                                    <!-- PayPal Fields -->
+                                    <div id="paypalFields" class="mt-3 ps-4" style="display: none;">
+                                        
+                                        
+                                        <div class="mb-3">
+                                            <label for="paypalEmail" class="form-label">PayPal Email</label>
+                                            <input type="email" class="form-control" id="paypalEmail" name="paypalEmail" placeholder="your@email.com" required>
+                                        </div>
+                                        <div class="alert alert-info mb-3">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Please enter your PayPal email to proceed
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 py-2">
-                                <i class="fas fa-lock me-2"></i>Complete Secure Payment
+                            <button type="submit" class="btn btn-primary w-100 py-2" id="submitButton">
+                                <i class="fa-solid fa-money-check me-2"></i>Complete Payment
                             </button>
                         </form>
                     </div>
@@ -43,19 +124,23 @@
             </div>
 
             <div class="col-lg-4">
-                <div class="card shadow-sm border-0 rounded-4 sticky-top" style="top: 20px;">
+                <div class="card shadow-sm border-0 rounded-4">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-4">Order Summary</h5>
                         {% for item in cart.items.all %}
-                        <div class="d-flex mb-3">
-                            <img src="{{ item.course.thumbnail.url }}" alt="{{ item.course.title }}" 
-                                 class="rounded me-3" width="60" height="40" style="object-fit: cover;">
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between">
-                                    <span class="text-truncate">{{ item.course.title }}</span>
-                                    <span>${{ item.course.price }}</span>
+                        <div class="mb-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <img src="{{ item.course.thumbnail.url }}" alt="{{ item.course.title }}" 
+                                     class="rounded flex-shrink-0" width="60" height="40" style="object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <div class="mb-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="pe-2">{{ item.course.title }}</div>
+                                            <div class="flex-shrink-0">${{ item.course.price }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-muted">By {{ item.course.instructor.get_full_name }}</div>
                                 </div>
-                                <small class="text-muted">By {{ item.course.instructor }}</small>
                             </div>
                         </div>
                         {% endfor %}
@@ -71,20 +156,90 @@
     </div>
 </div>
 
-<style>
-    .card {
-        transition: all 0.3s ease;
-    }
-    .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1) !important;
-    }
-    
-    @media (max-width: 992px) {
-        .container-fluid.px-lg-5 {
-            padding-left: 1.5rem !important;
-            padding-right: 1.5rem !important;
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentForm = document.getElementById('paymentForm');
+    const creditCardRadio = document.getElementById('creditCard');
+    const paypalRadio = document.getElementById('paypal');
+    const creditCardFields = document.getElementById('creditCardFields');
+    const paypalFields = document.getElementById('paypalFields');
+    const submitButton = document.getElementById('submitButton');
+
+    // Toggle payment fields
+    function togglePaymentFields() {
+        if (creditCardRadio.checked) {
+            creditCardFields.style.display = 'block';
+            paypalFields.style.display = 'none';
+            // Enable all credit card fields
+            document.querySelectorAll('#creditCardFields input').forEach(input => {
+                input.required = true;
+            });
+            // Disable PayPal email field
+            document.getElementById('paypalEmail').required = false;
+        } else {
+            creditCardFields.style.display = 'none';
+            paypalFields.style.display = 'block';
+            // Disable credit card fields
+            document.querySelectorAll('#creditCardFields input').forEach(input => {
+                input.required = false;
+            });
+            // Enable PayPal email field
+            document.getElementById('paypalEmail').required = true;
         }
     }
-</style>
+
+    // Initialize
+    togglePaymentFields();
+
+    // Add event listeners
+    creditCardRadio.addEventListener('change', togglePaymentFields);
+    paypalRadio.addEventListener('change', togglePaymentFields);
+
+    // Handle form submission
+    paymentForm.addEventListener('submit', function(e) {
+        if (paypalRadio.checked) {
+            // Validate PayPal email
+            const paypalEmail = document.getElementById('paypalEmail').value;
+            if (!paypalEmail || !paypalEmail.includes('@')) {
+                e.preventDefault();
+                alert('Please enter a valid PayPal email address');
+                return;
+            }
+            
+            // Show processing message
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing PayPal Payment...';
+        }
+       
+    });
+
+    // Format card number input
+    const cardNumberInput = document.getElementById('cardNumber');
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/\D/g, '');
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += ' ';
+                formatted += value[i];
+            }
+            e.target.value = formatted.substring(0, 19);
+        });
+    }
+
+    // Format expiry date input
+    const expiryDateInput = document.getElementById('expiryDate');
+    if (expiryDateInput) {
+        expiryDateInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value.substring(0, 5);
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -1,5 +1,7 @@
 from django import template
 from urllib.parse import urlencode
+from django.utils import timezone
+from datetime import datetime
 register = template.Library()
 
 @register.filter
@@ -56,3 +58,29 @@ def get_item(dictionary, key):
 def rating_count(course, rating):
     """Returns count of reviews with specific rating for a course"""
     return course.reviews.filter(rating=rating).count()
+
+
+@register.filter
+def relative_time(value):
+    now = timezone.now()
+    diff = now - value
+
+    seconds = diff.total_seconds()
+    days = diff.days
+
+    if days > 365:
+        years = days // 365
+        return f"{years} year{'s' if years != 1 else ''} ago"
+    elif days > 30:
+        months = days // 30
+        return f"{months} month{'s' if months != 1 else ''} ago"
+    elif days > 0:
+        return f"{days} day{'s' if days != 1 else ''} ago"
+    elif seconds > 3600:
+        hours = seconds // 3600
+        return f"{int(hours)} hour{'s' if hours != 1 else ''} ago"
+    elif seconds > 60:
+        minutes = seconds // 60
+        return f"{int(minutes)} minute{'s' if minutes != 1 else ''} ago"
+    else:
+        return "Just now"

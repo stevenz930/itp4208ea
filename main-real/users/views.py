@@ -4,7 +4,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db.models import Q
 from .forms import CustomUserCreationForm, ProfileSettingsForm
-from .backends import EmailOrUsernameModelBackend
 from django.contrib.auth.decorators import login_required
 from courses.models import Course, CourseCategory
 from users.models import CustomUser
@@ -103,7 +102,8 @@ def search_courses(request):
             Q(tags__name__icontains=query) |
             Q(instructor__username__icontains=query) |
             Q(instructor__email__icontains=query)
-        )
+        ).select_related('instructor').prefetch_related('tags').distinct()
+
         query_lower = query.lower()
         filtered_courses = [
             course for course in courses
@@ -114,17 +114,17 @@ def search_courses(request):
                 query_lower in course.instructor.email.lower())
         ]
     else:
-        filtered_courses = Course.objects.all()
+        filtered_courses = Course.objects.all().select_related('instructor').prefetch_related('tags')
+
     context = {
         'courses': filtered_courses,
         'query': query,
     }
     return render(request, 'search_results.html', context)
 
-
 def autocomplete(request):
     query = request.GET.get('q', '')
-    if query:
+    if query: 
         courses = Course.objects.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
@@ -132,7 +132,8 @@ def autocomplete(request):
             Q(instructor__username__icontains=query) |
             Q(instructor__email__icontains=query),
             is_published=True
-        )[:10]
+        ).select_related('instructor').prefetch_related('tags').distinct()[:10]
+       
         query_lower = query.lower()
         filtered_courses = [
             course for course in courses
@@ -142,8 +143,9 @@ def autocomplete(request):
                 query_lower in course.instructor.username.lower() or
                 query_lower in course.instructor.email.lower())
         ][:5]
+
         suggestions = [
-            {'title': course.title, 'instructor': course.instructor.username}
+            {'title': course.title, 'instructor': f"{course.instructor.first_name} {course.instructor.last_name}"}
             for course in filtered_courses
         ]
     else:

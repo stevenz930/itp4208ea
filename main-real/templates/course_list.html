@@ -243,13 +243,17 @@
                                             <i class="{{ star_class }}"></i>
                                         {% endfor %}
                                     </span>
-                                    <span>{{ course.average_rating|default:"0.0"|floatformat:1 }} ({{ course.rating_count|default:0 }})</span>
+                                    <span>{{ course.average_rating|floatformat:1 }} ({{ course.rating_count|default:0 }})</span>
                                 </div>
                                 <div class="course-price d-flex justify-content-between align-items-center">
                                     <div>
-                                        <span class="current-price">${{ course.price }}</span>
-                                        {% if course.discount_price %}
-                                        <span class="original-price">${{ course.discount_price }}</span>
+                                        {% if course.is_free %}
+                                            <span class="badge bg-success">FREE</span>
+                                        {% else %}
+                                            <span class="current-price">${{ course.price }}</span>
+                                            {% if course.discount_price %}
+                                            <span class="original-price">${{ course.discount_price }}</span>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                     {% if course.is_new %}

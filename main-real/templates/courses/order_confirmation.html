@@ -2,70 +2,85 @@
 
 {% block content %}
 <div class="container my-5">
-    <div class="card border-success shadow">
-        <div class="card-header bg-success text-white py-3">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-success text-white p-4 rounded-top-4">
             <div class="d-flex justify-content-between align-items-center">
-                <h3 class="mb-0"><i class="fas fa-check-circle me-2"></i>Order Confirmation</h3>
-                <span class="badge bg-light text-success fs-6">#{{ order.order_number }}</span>
+                <div class="d-flex align-items-center">
+                    <div class="success-icon-circle me-3">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <h3 class="mb-0">Order Confirmation</h3>
+                </div>
+                <div class="order-number-badge">
+                    Order #{{ order.order_number }}
+                </div>
             </div>
         </div>
-        <div class="card-body">
-            <div class="alert alert-success bg-light-success border-0">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-check-circle fa-2x text-success me-3"></i>
+        <div class="card-body p-4">
+            <div class="success-message mb-4">
+                <div class="d-flex align-items-center p-4 rounded-3">
+                    <div class="success-icon me-4">
+                        <i class="fas fa-check-circle fa-3x"></i>
+                    </div>
                     <div>
-                        <h4 class="alert-heading">Thank you for your order!</h4>
-                        <p class="mb-0">Your order has been completed successfully.</p>
+                        <h4 class="fw-bold mb-2">Thank you for your purchase!</h4>
+                        <p class="mb-0 text-muted">Your order has been completed successfully. You can now access your courses.</p>
                     </div>
                 </div>
             </div>
             
-            <div class="row">
-                <div class="col-md-8">
-                    <h5 class="fw-bold mb-3">Order Details</h5>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Course</th>
-                                    <th>Instructor</th>
-                                    <th>Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in order.items.all %}
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{ item.course.thumbnail.url }}" alt="{{ item.course.title }}" 
-                                                 class="rounded me-2" width="40" height="30" style="object-fit: cover;">
-                                            <span>{{ item.course.title }}</span>
-                                        </div>
-                                    </td>
-                                    <td>{{ item.course.instructor }}</td>
-                                    <td>${{ item.price }}</td>
-                                </tr>
-                                {% endfor %}
-                                <tr class="table-active">
-                                    <td colspan="2"><strong>Total</strong></td>
-                                    <td><strong>${{ order.total_amount }}</strong></td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <div class="row g-4">
+    <div class="col-md-8">
+        <div class="order-details p-4 rounded-3 bg-light">
+            <h5 class="fw-bold mb-4">Order Details</h5>
+            <div class="table-responsive">
+                <table class="table table-borderless mb-0">
+                    <thead>
+                        <tr class="border-bottom">
+                            <th class="ps-0 text-secondary">Course</th>
+                            <th class="text-secondary">Instructor</th>
+                            <th class="text-end pe-0 text-secondary">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-light">
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td class="ps-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="course-thumbnail me-3">
+                                        <img src="{{ item.course.thumbnail.url }}" alt="{{ item.course.title }}" 
+                                             class="rounded-3" width="60" height="40" style="object-fit: cover;">
+                                    </div>
+                                    <span class="fw-medium">{{ item.course.title }}</span>
+                                </div>
+                            </td>
+                            <td class="text-muted">{{ item.course.instructor.get_full_name }}</td>
+                            <td class="text-end pe-0">${{ item.price }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="border-top">
+                            <td colspan="2" class="ps-0 pt-3">
+                                <strong class="fs-5">Total</strong>
+                            </td>
+                            <td class="text-end pe-0 pt-3">
+                                <strong class="fs-5 text-success">${{ order.total_amount }}</strong>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card border-0 bg-light">
-                        <div class="card-body">
-                            <h5 class="fw-bold mb-3">What's Next?</h5>
-                            <div class="d-grid gap-2">
-                                <a href="{% url 'my_study' %}" class="btn btn-success">
-                                    <i class="fas fa-play-circle me-2"></i>Start Learning
-                                </a>
-                                <a href="{% url 'course_list' %}" class="btn btn-outline-primary">
-                                    <i class="fas fa-book-open me-2"></i>Browse More Courses
-                                </a>
-                            </div>
+                    <div class="next-steps p-4 rounded-3 bg-light">
+                        <h5 class="fw-bold mb-4">What's Next?</h5>
+                        <div class="d-grid gap-3">
+                            <a href="{% url 'my_study' %}" class="btn btn-success btn-lg hover-scale">
+                                <i class="fas fa-play-circle me-2"></i>Start Learning
+                            </a>
+                            <a href="{% url 'course_list' %}" class="btn btn-outline-primary hover-scale">
+                                <i class="fas fa-book-open me-2"></i>Browse More Courses
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -75,11 +90,83 @@
 </div>
 
 <style>
-    .card-header {
-        border-radius: 0 !important;
+    .success-icon-circle {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    .bg-light-success {
+
+    .order-number-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-weight: 500;
+    }
+
+    .success-message {
         background-color: rgba(25, 135, 84, 0.1);
+        border-left: 4px solid #198754;
+    }
+
+    .success-icon {
+        color: #198754;
+    }
+
+    .order-details {
+        background-color: #f8f9fa;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table tbody {
+        background-color: #f8f9fa !important;
+    }
+
+    .table th {
+        font-weight: 600;
+        color: #6c757d;
+        background-color: #f8f9fa;
+    }
+
+    .table td {
+        background-color: #f8f9fa;
+    }
+
+    .course-thumbnail img {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-success {
+        padding: 1rem;
+        font-weight: 500;
+    }
+
+
+
+    @media (max-width: 768px) {
+        .card-header {
+            padding: 1.5rem;
+        }
+        
+        .success-icon-circle {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .success-icon-circle i {
+            font-size: 1.5rem;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+        }
     }
 </style>
 {% endblock %}

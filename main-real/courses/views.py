@@ -30,8 +30,6 @@ def course_list(request):
             course__in=courses
         ).distinct()
 
-
-
     # Handle multiple category selections
     selected_categories = request.GET.getlist('category')
     if selected_categories:
@@ -131,7 +129,6 @@ def enroll_course(request, course_id):
     if request.method == 'POST':
         course = get_object_or_404(Course, is_published=True, id=course_id)
         
-        
         existing_enrollment = Enrollments.objects.filter(
             student=request.user,
             Course=course
@@ -206,7 +203,7 @@ def checkout(request):
        
         order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
         
-        # Create order
+       
         order = Order.objects.create(
             user=request.user,
             order_number=order_number,
@@ -214,7 +211,7 @@ def checkout(request):
             status='completed'  
         )
         
-        # Create order items
+       
         for item in cart.items.all():
             OrderItem.objects.create(
                 order=order,
