@@ -33,9 +33,9 @@
 
 <div class="d-flex flex-column min-vh-100">
     <div class="container-fluid px-lg-5 flex-grow-1 py-4 py-lg-5">
-        <div class="d-flex justify-content-between align-items-center mb-4 mb-lg-5">
-            <h2 class="fw-bold mb-0">Checkout</h2>
-            <a href="{% url 'view_cart' %}" class="btn btn-outline-primary btn-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3 mb-lg-4">
+            <h1 class="fw-bold mb-0 font-monospace">Checkout</h1>
+            <a href="{% url 'view_cart' %}" class="btn btn-outline-primary btn-sm font-monospace fw-bold">
                 <i class="fas fa-arrow-left me-2"></i>Back to Cart
             </a>
         </div>
@@ -44,7 +44,7 @@
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0 rounded-4 mb-4">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-4">Payment Details</h5>
+                        <h3 class="fw-bold mb-4 font-monospace">Payment Details</h3>
                         <form method="post" id="paymentForm">
                             {% csrf_token %}
                             <div class="mb-4">
@@ -70,7 +70,7 @@
                                         </div>
                                         <div class="mb-3">
                                             <label for="cardNumber" class="form-label">Card Number</label>
-                                            <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="0000 0000 0000 0000 pattern="\d{4} \d{4} \d{4} \d{4}" required>
+                                            <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="0000 0000 0000 0000" pattern="\d{4} \d{4} \d{4} \d{4}" required>
                                         </div>
                                         <div class="row g-3">
                                             <div class="col-md-6">
@@ -115,7 +115,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 py-2" id="submitButton">
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold font-monospace" id="submitButton">
                                 <i class="fa-solid fa-money-check me-2"></i>Complete Payment
                             </button>
                         </form>
@@ -126,7 +126,7 @@
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0 rounded-4">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-4">Order Summary</h5>
+                        <h3 class="fw-bold mb-4 font-monospace">Order Summary</h3>
                         {% for item in cart.items.all %}
                         <div class="mb-3">
                             <div class="d-flex align-items-start gap-3">
@@ -136,7 +136,7 @@
                                     <div class="mb-1">
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div class="pe-2">{{ item.course.title }}</div>
-                                            <div class="flex-shrink-0">${{ item.course.price }}</div>
+                                            <div class="flex-shrink-0 font-monospace">${{ item.course.price }}</div>
                                         </div>
                                     </div>
                                     <div class="text-muted">By {{ item.course.instructor.get_full_name }}</div>
@@ -146,8 +146,8 @@
                         {% endfor %}
                         <hr class="my-3">
                         <div class="d-flex justify-content-between fw-bold fs-5">
-                            <span>Total</span>
-                            <span>${{ cart.total_price }}</span>
+                            <span class="fs-4 font-monospace">Total</span>
+                            <span class="fs-4 font-monospace">${{ cart.total_price }}</span>
                         </div>
                     </div>
                 </div>

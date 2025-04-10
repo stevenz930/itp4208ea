@@ -2,7 +2,7 @@
 {% load course_extras %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-<nav class="shadow-sm navbar navbar-expand-lg navbar-light bg-light shadow-sm sticky-top py-0">
+<nav class="shadow-sm navbar navbar-expand-lg navbar-light bg-light shadow-sm sticky-top pt-1 pb-0">
     <div class="container-fluid mx-3 d-flex justify-content-between">
       <!-- 左側 Logo -->
       <a class="navbar-brand mb-0 fs-2 fw-bold font-monospace text-primary" href="/"> LearnHub
@@ -46,10 +46,10 @@
             <div class="d-flex">
               <!-- 購物車 -->
               <a href="{% url 'view_cart' %}" class="btn btn-link text-dark position-relative mx-2" title="Cart">
-                <i class="fas fa-shopping-cart fs-5"></i>
+                <i class="fas fa-shopping-cart fs-5 pt-1"></i>
                 {% with cart_items=user.cart.items.count %}
                   {% if cart_items > 0 %}
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                       {{ cart_items }}
                     </span>
                   {% endif %}
@@ -59,7 +59,7 @@
               <!-- 用戶下拉選單 -->
               <div class="dropdown">
                 <a class="btn btn-link text-dark dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fas fa-user fs-5"></i>
+                  <img src="{{ user.avatar.url }}" class="rounded-circle mb-1" style="width: 24px; height: 24px;">
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                   <li><a class="dropdown-item" href="{% url 'my_study' %}"><i class="fa-solid fa-bookmark me-2"></i>Study</a></li>
