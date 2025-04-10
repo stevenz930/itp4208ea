@@ -63,7 +63,8 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                   <li><a class="dropdown-item" href="{% url 'my_study' %}"><i class="fa-solid fa-bookmark me-2"></i>Study</a></li>
-                  <li><a class="dropdown-item" href="{% url 'profile_settings' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                  <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                  <li><a class="dropdown-item" href="{% url 'profile_settings' %}"><i class="fas fa-user me-2"></i>Setting</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li>
                     <form action="{% url 'logout' %}" method="post" class="d-inline">

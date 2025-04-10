@@ -1,166 +1,246 @@
-
 {% extends 'base.html' %}
 {% load static %}
 
 {% block content %}
-<div class=" ">
+<style>
+    .social-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    .info-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .bg-gradient-instagram {
+        background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    }
+    
+    .bg-linkedin {
+        background-color: #0a66c2;
+    }
+
+    .section-title {
+        padding-left: 1%;
+    }
+    
+    .profile-card {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .avatar-wrapper {
+        transition: all 0.3s ease;
+    }
+
+    .avatar-wrapper:hover {
+        background-color: #f8f9fa !important;
+    }
+
+    .form-control:focus {
+        border-color: #dee2e6;
+        box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group-text {
+        min-width: 40px;
+        justify-content: center;
+    }
+
+    .alert {
+        border-left: 4px solid #198754;
+    }
+</style>
+
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0 py-3">
+        <div class="col-lg-12">
+            {% if messages %}
+                {% for message in messages %}
+                    {% if 'profile_settings' in message.extra_tags %}
+                        <div class="alert alert-success border-0 shadow-sm mb-4 rounded-3">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-sm">
+                <!-- Profile Header -->
+                <div class="card-header bg-light px-4 py-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="h5 mb-0">Profile Settings</h2>
-                        <button type="submit" form="profileForm" class="btn btn-primary btn-sm">Save Changes</button>
+                        <h2 class="mb-0 fw-bold">Profile Settings</h2>
+                        <button type="submit" form="profileForm" class="btn btn-dark">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
                     </div>
                 </div>
                 
-                <div class="card-body">
-                    {% if messages %}
-                        {% for message in messages %}
-                        {% if 'profile_settings' in message.extra_tags %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                    
-                    <form id="profileForm" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <div class="card-body p-0">
+                    <form id="profileForm" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
+                        {{ form.non_field_errors }}
                         
-                        <!-- Avatar Section -->
-                        <div class="mb-4 text-center">
-                            <div class="position-relative d-inline-block">
-                                {% if request.user.avatar %}
-                                    <img src="{{ request.user.avatar.url }}" 
-                                         alt="{{ request.user.username }}" 
-                                         class="rounded-circle border" 
-                                         width="120" height="120" id="avatarPreview">
-                                {% else %}
-                                    <img src="{% static 'images/blank_profile.png' %}" 
-                                         alt="Default avatar" 
-                                         class="rounded-circle border" 
-                                         width="120" height="120" id="avatarPreview">
-                                {% endif %}
-                                <label for="id_avatar" class="btn btn-sm btn-light rounded-circle position-absolute bottom-0 end-0">
-                                    <i class="fas fa-camera"></i>
-                                    <input type="file" name="avatar" id="id_avatar" class="d-none" accept="image/*">
-                                </label>
+                        <!-- Avatar and Basic Info -->
+                        <div class="row align-items-center p-4">
+                            <div class="col-md-3 text-center mb-4 mb-md-0">
+                                <div class="position-relative d-inline-block">
+                                    <div class="avatar-wrapper rounded-circle bg-light p-1 mx-auto" style="width: 160px; height: 160px;">
+                                        {% if request.user.avatar %}
+                                            <img src="{{ request.user.avatar.url }}" 
+                                                 alt="{{ request.user.username }}" 
+                                                 class="rounded-circle" 
+                                                 width="154" height="154" 
+                                                 style="object-fit: cover;"
+                                                 id="avatarPreview">
+                                        {% else %}
+                                            <img src="{% static 'images/blank_profile.png' %}" 
+                                                 alt="Default avatar" 
+                                                 class="rounded-circle" 
+                                                 width="154" height="154" 
+                                                 style="object-fit: cover;"
+                                                 id="avatarPreview">
+                                        {% endif %}
+                                    </div>
+                                    <label for="id_avatar" class="btn btn-light btn-sm rounded-circle position-absolute bottom-0 end-0 shadow-sm" 
+                                           style="width: 32px; height: 32px;">
+                                        <i class="fas fa-camera"></i>
+                                        <input type="file" name="avatar" id="id_avatar" class="d-none" accept="image/*">
+                                    </label>
+                                </div>
+                                <div class="small text-muted mt-2">Click to change profile photo</div>
                             </div>
-                            <div class="small text-muted mt-2">Click the camera icon to change your avatar</div>
                         </div>
-                        
+
                         <!-- Basic Information Section -->
-                        <div class="mb-4">
-                            <h5 class="mb-3 border-bottom pb-2">Basic Information</h5>
-                            
-                            <div class="mb-3">
-                                <label for="id_username" class="form-label">Username</label>
-                                <input type="text" name="username" id="id_username" 
-                                       class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
-                                       value="{{ form.username.value|default:request.user.username }}" required>
-                                {% if form.username.errors %}
-                                    <div class="invalid-feedback">
-                                        {% for error in form.username.errors %}
-                                            {{ error }}
-                                        {% endfor %}
+                        <div class="profile-card">
+                            <div class="card-header bg-white">
+                                <h3 class="section-title">Basic Information</h3>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="id_first_name" class="form-label">First Name</label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.first_name.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="id_email" class="form-label">Email</label>
-                                <input type="email" name="email" id="id_email" 
-                                       class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
-                                       value="{{ form.email.value|default:request.user.email }}" required>
-                                {% if form.email.errors %}
-                                    <div class="invalid-feedback">
-                                        {% for error in form.email.errors %}
-                                            {{ error }}
-                                        {% endfor %}
+                                    
+                                    <div class="col-md-6">
+                                        <label for="id_last_name" class="form-label">Last Name</label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.last_name.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Bio</label>
-                                {{ form.bio }}
-                                <div class="form-text">Tell us a little about yourself</div>
-                            </div>
-<!--                             
-                            <div class="mb-3 p-3 rounded">
-                                <div class="form-check form-switch d-flex align-items-center mr-3">
-                                    <input class="form-check-input ms-0" type="checkbox" name="profile_public" 
-                                           id="id_profile_public" {% if form.profile_public.value %}checked{% endif %}>
-                                    <label class="form-check-label pl-4 ms-2" for="id_profile_public">Make profile public</label>
+                                    
+                                    <div class="col-12">
+                                        <label class="form-label">Bio</label>
+                                        {{ form.bio }}
+                                        {% if form.bio.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.bio.errors }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">Brief description about yourself</div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="profile_public" 
+                                                   id="id_profile_public" {% if request.user.profile_public %}checked{% endif %}>
+                                            <label class="form-check-label text-muted" for="id_profile_public">
+                                                Make my profile public
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div> -->
+                        </div>
                         
                         <!-- Social Media Section -->
-                        <div class="mb-4">
-                            <h5 class="mb-3 border-bottom pb-2">Social Media</h5>
-                            
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fab fa-facebook-f text-primary"></i></span>
-                                        <input type="url" name="facebook_url" id="id_facebook_url" 
-                                               class="form-control" placeholder="https://facebook.com/username (Optional)"
-                                               value="{{ form.facebook_url.value|default:request.user.facebook_url }}">
+                        <div class="profile-card">
+                            <div class="card-header bg-white">
+                                <h3 class="section-title">Social Media</h3>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="fab fa-facebook-f text-primary"></i>
+                                            </span>
+                                            {{ form.facebook_url }}
+                                        </div>
+                                        {% if form.facebook_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.facebook_url.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fab fa-twitter text-info"></i></span>
-                                        <input type="url" name="twitter_url" id="id_twitter_url" 
-                                               class="form-control" placeholder="https://twitter.com/username (Optional)"
-                                               value="{{ form.twitter_url.value|default:request.user.twitter_url }}">
+                                    
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="fab fa-twitter text-info"></i>
+                                            </span>
+                                            {{ form.twitter_url }}
+                                        </div>
+                                        {% if form.twitter_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.twitter_url.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fab fa-instagram text-danger"></i></span>
-                                        <input type="url" name="instagram_url" id="id_instagram_url" 
-                                               class="form-control" placeholder="https://instagram.com/username (Optional)"
-                                               value="{{ form.instagram_url.value|default:request.user.instagram_url }}">
+                                    
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="fab fa-instagram text-danger"></i>
+                                            </span>
+                                            {{ form.instagram_url }}
+                                        </div>
+                                        {% if form.instagram_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.instagram_url.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fab fa-linkedin-in text-primary"></i></span>
-                                        <input type="url" name="linkedin_url" id="id_linkedin_url" 
-                                               class="form-control" placeholder="https://linkedin.com/in/username (Optional)"
-                                               value="{{ form.linkedin_url.value|default:request.user.linkedin_url }}">
+                                    
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="fab fa-linkedin-in text-primary"></i>
+                                            </span>
+                                            {{ form.linkedin_url }}
+                                        </div>
+                                        {% if form.linkedin_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.linkedin_url.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                       
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-// Preview avatar image before upload
-document.getElementById('id_avatar').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('avatarPreview').src = e.target.result;
-        }
-        reader.readAsDataURL(file);
-    }
-});
-</script>
 {% endblock %}
-the public profile switch was not guided or margin inside border left

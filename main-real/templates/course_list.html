@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load course_extras %}
 
@@ -5,104 +6,177 @@
 
 {% block content %}
 
-{% load course_extras %}
+<style>
+.mobile-filter-btn {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 3.5rem;
+    height: 3.5rem;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
 
-    <!-- Mobile Filter Button -->
-    <button class="mobile-filter-btn d-lg-none" id="mobileFilterBtn">
-        <i class="fas fa-sliders-h"></i>
-    </button>
-    
-    <!-- Filter Overlay -->
-    <div class="filter-overlay" id="filterOverlay"></div>
-    
-    <!-- Mobile Filter Sidebar -->
-    <div class="filter-sidebar d-lg-none" id="filterSidebar">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Filters</h5>
-            <button class="btn btn-sm btn-link p-0 d-lg-none" id="closeFilterSidebar">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        
-        <!-- Categories Filter -->
-        <div class="mb-4">
-            <button class="btn btn-filter w-100 text-start d-flex justify-content-between align-items-center" 
-                    data-bs-toggle="collapse" data-bs-target="#categoriesCollapse">
-                <span>Categories</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="collapse show" id="categoriesCollapse">
-                <div class="mt-2">
-                    {% for category in filtered_categories %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="category" 
-                                        id="category-{{ category.id }}" value="{{ category.id }}"
-                                        {% if category.id|stringformat:"s" in request.GET.getlist %}checked{% endif %}>
-                                    <label class="form-check-label" for="category-{{ category.id }}">{{ category.name }}</label>
-                                </div>
-                                {% empty %}
-                                <div class="text-muted">No categories available for this subject</div>
-                                {% endfor %}             
-                </div>
-            </div>
-        </div>
-        
-        <!-- Level Filter -->
-        <div class="mb-4">
-            <button class="btn btn-filter w-100 text-start d-flex justify-content-between align-items-center" 
-                    data-bs-toggle="collapse" data-bs-target="#levelCollapse">
-                <span>Level</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="collapse show" id="levelCollapse">
-                <div class="mt-2">
-                    {% for level in level_choices %}
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="level" 
-                        id="level-{{ level.0 }}" value="{{ level.0 }}"
-                        {% if level.0 in request.GET.getlist %}checked{% endif %}>
-                        <label class="form-check-label" for="level-{{ level.0 }}">{{ level.1 }}</label>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        
-        <!-- Duration Filter -->
-        <div class="mb-4">
-            <button class="btn btn-filter w-100 text-start d-flex justify-content-between align-items-center" 
-                    data-bs-toggle="collapse" data-bs-target="#durationCollapse">
-                <span>Duration</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="collapse show" id="durationCollapse">
-                <div class="mt-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="duration" id="short" value="short"
-                               {% if request.GET.duration == 'short' %}checked{% endif %}>
-                        <label class="form-check-label" for="short">0-5 hours</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="duration" id="medium" value="medium"
-                               {% if request.GET.duration == 'medium' %}checked{% endif %}>
-                        <label class="form-check-label" for="medium">5-10 hours</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="duration" id="long" value="long"
-                               {% if request.GET.duration == 'long' %}checked{% endif %}>
-                        <label class="form-check-label" for="long">10+ hours</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+.mobile-filter-btn:hover {
+    background: #0b5ed7;
+}
+.filter-sidebar {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    width: 100%; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
 
+
+.accordion-item {
+    border: none;
+    margin-bottom: 0.25rem;
+    background: transparent;
+}
+
+.accordion-button {
+    padding: 1rem;
+    font-weight: 500;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem !important;
+    border: none;
+    box-shadow: none;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #f0f7ff;
+    color: #0d6efd;
+    box-shadow: none;
+}
+
+.accordion-button::after {
+    margin-left: auto;
+}
+
+.accordion-body {
+    padding: 0.5rem 0;
+    background: transparent;
+}
+
+/* Category list styles */
+.filter-categories {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+}
+
+/* Checkbox styles */
+.form-check {
+    margin-bottom: 0.75rem;
+    padding-left: 1.75rem;
+}
+
+.form-check-input {
+    margin-left: -1.75rem;
+}
+
+.form-check-label {
+    color: #333;
+    font-size: 0.95rem;
+}
+
+/* Remove border from collapse */
+.accordion-collapse {
+    border: 0;
+}
+
+/* Price range container */
+.price-range-container {
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    margin-top: 0;
+}
+
+/* Filter section headers */
+.accordion-button {
+    font-size: 1.1rem;
+    color: #333;
+}
+.price-range-container {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+}
+
+.price-slider {
+    position: relative;
+    height: 5px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    margin: 15px 0;
+}
+
+.price-range {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    background: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+.price-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #0d6efd;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+   
+}
+
+
+.price-progress {
+    position: absolute;
+    height: 5px;
+    background: #0d6efd;
+    border-radius: 5px;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.price-display {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.price-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+</style>
+{% include 'include/course_listMob.html' %}
+    
    <!-- Subject Tabs -->
 <div class="subject-tabs-container">
     <div class="container">
         <ul class="nav subject-tabs">
             <li class="nav-item">
-                <a class="nav-link{% if not current_subject %}active{% endif %}" 
+                <a class="nav-link {% if not current_subject %}active{% endif %}" 
                    href="?subject=all">All</a>
             </li>
             {% for subject in subjects %}
@@ -116,118 +190,111 @@
 </div>
 
     <!-- Main Content -->
-    <div class="container my-5">
-        <div class="row">
-            <!-- Desktop Filter Sidebar (hidden on mobile) -->
+<div class="container my-5">
+    <div class="row">
+            <!-- Desktop Filter Sidebar  -->
             <div class="col-lg-3 mb-4 d-none d-lg-block">
-                <div class="filter-sidebar">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Filters</h5>
-                        <button class="btn btn-sm btn-link p-0" id="toggleAllFilters">
-                            <span>Expand All</span>
-                            <i class="fas fa-chevron-down ms-1"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- Categories Filter -->
-                    <div class="mb-4">
-                        <button class="btn btn-filter w-100 text-start d-flex justify-content-between align-items-center" 
-                                data-bs-toggle="collapse" data-bs-target="#desktopCategoriesCollapse">
-                            <span>Categories</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="collapse show" id="desktopCategoriesCollapse">
-                            <div class="mt-2">
-                                {% for category in filtered_categories %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="category" 
-                                        id="category-{{ category.id }}" value="{{ category.id }}"
-                                        {% if category.id|stringformat:"s" in request.GET.getlist %}checked{% endif %}>
-                                    <label class="form-check-label" for="category-{{ category.id }}">{{ category.name }}</label>
-                                </div>
-                                {% empty %}
-                                <div class="text-muted">No categories available for this subject</div>
-                                {% endfor %} 
-                            </div>
+                <form method="get" id="desktopFilterForm">
+                    <div class="filter-sidebar">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Filters</h5>
                         </div>
-                    </div>
-                    
-                    <!-- Level Filter -->
-                    <div class="mb-4">
-                        <button class="btn btn-filter w-100 text-start d-flex justify-content-between align-items-center" 
-                                data-bs-toggle="collapse" data-bs-target="#desktopLevelCollapse">
-                            <span>Level</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="collapse show" id="desktopLevelCollapse">
-                            <div class="mt-2">
-                                {% for level in level_choices %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="level" 
-                                           id="desktop-level-{{ level.0 }}" value="{{ level.0 }}"
-                                           {% if level.0 in request.GET.getlist|stringformat:"s" %}checked{% endif %}>
-                                    <label class="form-check-label" for="desktop-level-{{ level.0 }}">{{ level.1 }}</label>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {% comment %} Duration Filter {% endcomment %}
-                    <div class="mb-4">
-                        <button class="btn btn-filter w-100 text-start d-flex justify-content-between align-items-center" 
-                                data-bs-toggle="collapse" data-bs-target="#desktopDurationCollapse">
-                            <span>Duration</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="collapse show" id="desktopDurationCollapse">
-                            <div class="mt-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="duration" id="desktop-short" value="short"
-                                           {% if request.GET.duration == 'short' %}checked{% endif %}>
-                                    <label class="form-check-label" for="desktop-short">0-5 hours</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="duration" id="desktop-medium" value="medium"
-                                           {% if request.GET.duration == 'medium' %}checked{% endif %}>
-                                    <label class="form-check-label" for="desktop-medium">5-10 hours</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="duration" id="desktop-long" value="long"
-                                           {% if request.GET.duration == 'long' %}checked{% endif %}>
-                                    <label class="form-check-label" for="desktop-long">10+ hours</label>
+                        
+                        <div class="accordion" id="filterAccordion">
+                            <!-- Categories Filter -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#desktopCategoriesCollapse">
+                                        Categories
+                                    </button>
+                                </h2>
+                                <div id="desktopCategoriesCollapse" class="accordion-collapse collapse show" data-bs-parent="#filterAccordion">
+                                    <div class="accordion-body">
+                                        <div class="filter-categories">
+                                            {% for category in filtered_categories %}
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" name="category" 
+                                                    id="desktop-category-{{ category.id }}" value="{{ category.id }}"
+                                                    {% if category.id|stringformat:"s" in request.GET.getlist %}checked{% endif %}>
+                                                <label class="form-check-label" for="desktop-category-{{ category.id }}">{{ category.name }}</label>
+                                            </div>
+                                            {% empty %}
+                                            <div class="text-muted">No categories available for this subject</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+            
+                            <!-- Level Filter -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#desktopLevelCollapse">
+                                        Level
+                                    </button>
+                                </h2>
+                                <div id="desktopLevelCollapse" class="accordion-collapse collapse show" data-bs-parent="#filterAccordion">
+                                    <div class="accordion-body">
+                                        {% for level in level_choices %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="level" 
+                                                id="desktop-level-{{ level.0 }}" value="{{ level.0 }}"
+                                                {% if level.0 in request.GET.getlist|stringformat:"s" %}checked{% endif %}>
+                                            <label class="form-check-label" for="desktop-level-{{ level.0 }}">{{ level.1 }}</label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+            
+                            <!-- Price Filter -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#desktopPriceCollapse">
+                                        Price Range
+                                    </button>
+                                </h2>
+                                <div id="desktopPriceCollapse" class="accordion-collapse collapse show" data-bs-parent="#filterAccordion">
+                                    <div class="accordion-body">
+                                        <div class="price-range-container">
+                                            <div class="price-label mb-2">Select Price Range</div>
+                                            <div class="price-slider">
+                                                <div class="price-progress" id="desktopPriceProgress"></div>
+                                                <input type="range" 
+                                                    class="price-range" 
+                                                    min="{{ price_range.min_price|default:0|floatformat:0 }}" 
+                                                    max="{{ price_range.max_price|default:100|floatformat:0 }}" 
+                                                    step="1" 
+                                                    value="{{ request.GET.max_price|default:price_range.max_price|default:100|floatformat:0 }}"
+                                                    id="desktopPriceSlider">
+                                            </div>
+                                            <div class="price-display mt-2">
+                                                <span class="price-value">${{ request.GET.min_price|default:price_range.min_price|default:0|floatformat:0 }}</span>
+                                                <span class="price-value" id="desktopMaxPriceDisplay">
+                                                    ${{ request.GET.max_price|default:price_range.max_price|default:100|floatformat:0 }}
+                                                </span>
+                                            </div>
+                                            <input type="hidden" name="min_price" id="desktopMinPriceInput" value="{{ request.GET.min_price|default:price_range.min_price|default:0|floatformat:0 }}">
+                                            <input type="hidden" name="max_price" id="desktopMaxPriceInput" value="{{ request.GET.max_price|default:price_range.max_price|default:100|floatformat:0 }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        
+                        <button type="submit" style="display: none;"></button>
                     </div>
-                </div>
+                </form>
             </div>
+
+     
             
             <!-- Course List -->
             <div class="col-lg-9">
-                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-                    
-                    <div>
-                        {% if current_subject == 'all' %}
-                            <div class="d-flex">
-                                <h4 class="me-3 text-info fw-bold">All</h4>
-                                <h4 class="pe-5 me-5">Courses</h4>
-                            </div>
-                        {% else %}
-                            {% for subject in subjects %}
-                                {% if current_subject == subject.slug %}
-                                    <div class="d-flex">
-                                        <h4>All</h4>
-                                        <h4 class="mx-3 text-info fw-bold">{{ subject.name }}</h4>
-                                        <h4>Courses</h4>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                    
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>All Courses</h4>
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
                             Sort by: 
                             {% if current_sort == 'popular' %}Most Popular
                             {% elif current_sort == 'highest' %}Highest Rated
@@ -267,12 +334,11 @@
                                 <div class="course-price d-flex justify-content-between align-items-center">
                                     <div>
                                         {% if course.is_free %}
-                                            <span class="current-price fs-5 fw-bold text-dark-emphasis mt-1 text-decoration-line-through">${{ course.price }}</span>
-                                            <span class="badge bg-danger">FREE</span>
+                                            <span class="badge bg-warning text-dark">FREE</span>
                                         {% else %}
-                                            <span class="current-price fs-5 fw-bold mt-1">${{ course.price }}</span>
+                                            <span class="current-price">${{ course.price }}</span>
                                             {% if course.discount_price %}
-                                            <span class="original-price fs-5 fw-bold mt-1">${{ course.discount_price }}</span>
+                                            <span class="original-price">${{ course.discount_price }}</span>
                                             {% endif %}
                                         {% endif %}
                                     </div>
@@ -292,7 +358,7 @@
                     {% endfor %}
                 </div>
                 
-                                <!-- Pagination -->
+                <!-- Pagination -->
                 {% if courses.paginator.num_pages > 1 %}
                 <nav class="mt-5">
                     <ul class="pagination justify-content-center">
@@ -306,47 +372,17 @@
                         </li>
                         {% endif %}
                         
-                        {% comment %}                         
                         {% for num in courses.paginator.page_range %}
                             {% if num == courses.number %}
                             <li class="page-item active">
                                 <span class="page-link">{{ num }}</span>
                             </li>
                             {% else %}
-                                {%if num > 5 %}
-                                {% else %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?{% preserve_filters request 'page' num %}">{{ num }}</a>
-                                    </li>
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                        {% endcomment %}
-
-                        {% comment %} number pages {% endcomment %}
-                        <li class="page-item {% if courses.number == 1 %}active{% endif %}">
-                            <a class="page-link" href="?{% preserve_filters request 'page' 1 %}">1</a>
-                        </li>
-
-                        {% for num in courses.paginator.page_range %}
-                            {% if num <= 5 and num > 1 and courses.number <= 5 %}
-                                <li class="page-item {% if courses.number == num %}active{% endif %}">
-                                    <a class="page-link" href="?{% preserve_filters request 'page' num %}">{{ num }}</a>
-                                </li>
-                            {% endif %}
-                            {% if num >= 6 and courses.number >= 6 %}
-                                <li class="page-item {% if courses.number == num %}active{% endif %}">
-                                    <a class="page-link" href="?{% preserve_filters request 'page' num %}">{{ num }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-
-                        {%if courses.number <= 5 %}
                             <li class="page-item">
-                                <a class="page-link" href="?{% preserve_filters request 'page' 6 %}">...</a>
+                                <a class="page-link" href="?{% preserve_filters request 'page' num %}">{{ num }}</a>
                             </li>
-                        {% endif %}
-                        {% comment %} number pages {% endcomment %}
+                            {% endif %}
+                        {% endfor %}
                         
                         {% if courses.has_next %}
                         <li class="page-item">
@@ -364,5 +400,5 @@
         </div>
     </div>
 
-
+   
 {% endblock %}

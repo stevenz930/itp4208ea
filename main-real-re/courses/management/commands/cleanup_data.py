@@ -35,7 +35,8 @@ class Command(BaseCommand):
             Course,         # Depends on Category and User
             CourseCategory, # Depends on Subject
             Tag,           # Independent
-            Subject        # Independent
+            Subject       
+            
         ]
 
         for model in models_to_clear:

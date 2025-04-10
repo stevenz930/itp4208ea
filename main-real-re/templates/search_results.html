@@ -32,7 +32,7 @@
                         <h5 class="course-title">
                             <a href="{% url 'course_detail' course.id %}">{{ course.title }}</a>
                         </h5>
-                        <p class="course-instructor">{{ course.instructor.username }}</p>
+                        <p class="course-instructor">{{ course.instructor.get_full_name }}</p>
                         <div class="course-rating">
                             <span class="rating-stars">
                                 {% for star_class in course.average_rating|show_stars %}
