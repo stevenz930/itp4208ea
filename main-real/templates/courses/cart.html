@@ -37,7 +37,7 @@
     </style>
 <div class="d-flex flex-column min-vh-100 ">
 <div class="container flex-grow-1 mt-4">
-    <h2 class="mb-4">Your Shopping Cart</h2>
+    <h1 class="mb-4 font-monospace fw-bold">Shopping Cart</h1>
     
     {% if cart.items.all %}
     <div class="list-group mb-4">
@@ -51,7 +51,7 @@
                 <div class="flex-grow-1">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h5 class="mb-1">{{ item.course.title }}</h5>
+                            <h5 class="mb-1 text-dark">{{ item.course.title }}</h5>
                             <small class="text-muted">By {{ item.course.instructor.get_full_name}}</small>
                             <div class="mt-2">
                                 <span class="text-warning">
@@ -66,7 +66,7 @@
                         </div>
                     </a>
                         <div class="text-end">
-                            <p class="mb-1 fw-bold">${{ item.course.price }}</p>
+                            <p class="mb-1 fs-5 fw-bold font-monospace">${{ item.course.price }}</p>
                             <a href="{% url 'remove_from_cart' item.id %}" class="fa-solid fa-trash text-danger"></a>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
     
     <div class="card mb-4 shadow-sm order-summary-card">
         <div class="card-body p-4">
-            <h5 class="card-title fw-bold mb-4">Order Summary</h5>
+            <h5 class="card-title fw-bold mb-4 fs-4 font-monospace">Order Summary</h5>
             {% for item in cart.items.all %}
             <div class="mb-3">
                 <div class="d-flex justify-content-between align-items-start">
@@ -86,7 +86,7 @@
                         <h6 class="mb-1 text-dark">{{ item.course.title }}</h6>
                         <small class="text-muted">By {{ item.course.instructor.get_full_name }}</small>
                     </div>
-                    <span class="fw-bold text-dark">${{ item.course.price }}</span>
+                    <span class="fs-5 fw-bold text-dark font-monospace">${{ item.course.price }}</span>
                 </div>
             </div>
             {% if not forloop.last %}
@@ -95,11 +95,11 @@
             {% endfor %}
             <div class="total-section mt-4">
                 <div class="d-flex justify-content-between align-items-center fw-bold">
-                    <span class="fs-5">Total:</span>
-                    <span class="fs-5 text-primary">${{ cart.total_price }}</span>
+                    <span class="fs-4 font-monospace">Total:</span>
+                    <span class="fs-4 text-primary font-monospace">${{ cart.total_price }}</span>
                 </div>
             </div>
-            <a href="{% url 'checkout' %}" class="btn btn-primary w-100 mt-4 py-3 fw-semibold">
+            <a href="{% url 'checkout' %}" class="btn btn-primary w-100 mt-4 py-3 fw-semibold font-monospace">
                 <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
             </a>
         </div>

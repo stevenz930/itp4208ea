@@ -37,10 +37,10 @@
 </style>
 <div class="d-flex flex-column min-vh-100">
     <div class="container-fluid px-lg-5 flex-grow-1 py-4 py-lg-5">
-        <div class="d-flex justify-content-between align-items-center mb-4 mb-lg-5">
-            <h2 class="fw-bold mb-0">My Learning Journey</h2>
+        <div class="d-flex justify-content-between align-items-center mb-4 mb-lg-5 flex-wrap">
+            <h1 class="fw-bold mb-0 font-monospace">My Learning Journey</h1>
             {% if enrolled_courses %}
-            <a href="{% url 'course_list' %}" class="btn btn-outline-primary btn-sm">
+            <a href="{% url 'course_list' %}" class="btn btn-outline-primary btn-sm mt-1">
                 <i class="fas fa-plus me-2"></i>Explore More
             </a>
             {% endif %}

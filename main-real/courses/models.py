@@ -118,7 +118,7 @@ class Lesson(models.Model):
     title = models.CharField(max_length=200)
     order = models.PositiveIntegerField()
     content = models.TextField(blank=True)
-    video_url = models.URLField(blank=True)
+    video_url = models.CharField(max_length=255)
     duration = models.DurationField(blank=True, null=True)
     
 

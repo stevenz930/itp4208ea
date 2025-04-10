@@ -4,14 +4,14 @@
 <div class="container my-5">
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-header bg-success text-white p-4 rounded-top-4">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div class="d-flex align-items-center">
                     <div class="success-icon-circle me-3">
                         <i class="fas fa-check-circle fa-2x"></i>
                     </div>
-                    <h3 class="mb-0">Order Confirmation</h3>
+                    <h2 class="mb-0 fw-bold font-monospace">Order Confirmation</h2>
                 </div>
-                <div class="order-number-badge">
+                <div class="mt-2 order-number-badge fs-5 fw-bold font-monospace">
                     Order #{{ order.order_number }}
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="row g-4">
     <div class="col-md-8">
         <div class="order-details p-4 rounded-3 bg-light">
-            <h5 class="fw-bold mb-4">Order Details</h5>
+            <h4 class="fw-bold mb-4 font-monospace">Order Details</h4>
             <div class="table-responsive">
                 <table class="table table-borderless mb-0">
                     <thead>
@@ -55,15 +55,15 @@
                                 </div>
                             </td>
                             <td class="text-muted">{{ item.course.instructor.get_full_name }}</td>
-                            <td class="text-end pe-0">${{ item.price }}</td>
+                            <td class="text-end pe-0 font-monospace">${{ item.price }}</td>
                         </tr>
                         {% endfor %}
                         <tr class="border-top">
                             <td colspan="2" class="ps-0 pt-3">
-                                <strong class="fs-5">Total</strong>
+                                <p class="fs-5 fw-bold font-monospace">Total</p>
                             </td>
                             <td class="text-end pe-0 pt-3">
-                                <strong class="fs-5 text-success">${{ order.total_amount }}</strong>
+                                <strong class="fs-5 text-success font-monospace">${{ order.total_amount }}</strong>
                             </td>
                         </tr>
                     </tbody>
@@ -75,10 +75,10 @@
                     <div class="next-steps p-4 rounded-3 bg-light">
                         <h5 class="fw-bold mb-4">What's Next?</h5>
                         <div class="d-grid gap-3">
-                            <a href="{% url 'my_study' %}" class="btn btn-success btn-lg hover-scale">
+                            <a href="{% url 'my_study' %}" class="btn btn-success btn-lg hover-scale font-monospace fw-bold fs-4">
                                 <i class="fas fa-play-circle me-2"></i>Start Learning
                             </a>
-                            <a href="{% url 'course_list' %}" class="btn btn-outline-primary hover-scale">
+                            <a href="{% url 'course_list' %}" class="btn btn-outline-primary hover-scale font-monospace">
                                 <i class="fas fa-book-open me-2"></i>Browse More Courses
                             </a>
                         </div>
