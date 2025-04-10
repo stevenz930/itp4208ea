@@ -5,12 +5,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const filterOverlay = document.getElementById('filterOverlay');
     const closeFilterSidebar = document.getElementById('closeFilterSidebar');
     
-
-    mobileFilterBtn.addEventListener('click', function () {
-        filterSidebar.classList.add('show');
-        filterOverlay.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    });
+    if (mobileFilterBtn){
+        mobileFilterBtn.addEventListener('click', function () {
+            filterSidebar.classList.add('show');
+            filterOverlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+    }
 
     function closeMobileFilters() {
         filterSidebar.classList.remove('show');
@@ -18,8 +19,10 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.style.overflow = 'auto';
     }
 
-    closeFilterSidebar.addEventListener('click', closeMobileFilters);
-    filterOverlay.addEventListener('click', closeMobileFilters);
+    if (closeFilterSidebar || filterOverlay) {
+        closeFilterSidebar.addEventListener('click', closeMobileFilters);
+        filterOverlay.addEventListener('click', closeMobileFilters);
+    }
 
     // Toggle all filters button
     const toggleAllBtn = document.getElementById('toggleAllFilters');

@@ -33,20 +33,20 @@
             </button>
         </div>
         
-        <div class="container mx-0 mw-100"><!-- list courses by course type -->
-            <div class="container position-relative mw-75 py-3">
+        <div class="container mw-75 position-relative"><!-- list courses by course type -->
+            <div class="container mw-75 py-3">
                 <div class="tab-content overflow-hidden" id="myTabContent">
                     {% for coursetype in coursetypes %}<!-- a group of specify course type -->
                         <div class="mt-1 tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ coursetype.id }}" role="tabpanel" aria-labelledby="{{ coursetype.id }}-tab">
                             <div class="d-flex overflow-hidden" id="scrollTable" style="max-width: 100%; width: 100%; min-width: 600px;">
                                 {% for course in courses %}
                                     {% if course.category_id == coursetype.id %}<!-- all course card in the specify type -->
-                                        <div class="px-1 w-25" style="min-width: 25%;">
-                                            <div class="card" onclick="window.location.href='{% url 'course_detail' course.id %}';" style="cursor: pointer;">
+                                        <div class="mx-1 w-25" id="courseCardContainer">
+                                            <div class="card" id="courseCard" onclick="window.location.href='{% url 'course_detail' course.id %}';" style="cursor: pointer;">
                                                 <img src="{{ course.thumbnail.url }}" class="card-img-top">
                                                 <div class="card-body">
-                                                    <p class="card-title h5 fw-bold">{{ course.title }}</p>
-                                                    <p class="card-subtitle text-body-tertiary fs-6 fw-light ">{{ course.instructor.first_name }} {{ course.instructor.last_name }}</p>
+                                                    <p class="card-title fs-6 fw-bold text-truncate">{{ course.title }}</p>
+                                                    <p class="card-subtitle text-body-tertiary fs-6 ">{{ course.instructor.first_name }} {{ course.instructor.last_name }}</p>
                                                     <p class="card-text fs-5 fw-bold mt-1">${{ course.price }}</p>
                                                     <!--a href="#" class="btn btn-primary btn-sm">View more</a-->
                                                 </div>
@@ -59,18 +59,39 @@
                             
                         </div>
                     {% endfor %}
-                    <button type="button" class="p-0 opacity-25 btn btn-dark shadow rounded-circle border position-absolute translate-middle top-50 start-0 d-flex justify-content-center align-items-center" 
-                    style="width: 30px; height: 30px;" id="scrollLeft">
-                        <span class="carousel-control-prev-icon" aria-hidden="true" style="width: 16px;"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button type="button" class="p-0 opacity-25 btn btn-dark shadow rounded-circle border position-absolute translate-middle top-50 start-100 d-flex justify-content-center align-items-center" 
-                    style="width: 30px; height: 30px;" id="scrollRight">
-                        <span class="carousel-control-next-icon" aria-hidden="true" style="width: 16px;"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
                 </div>
             </div>
+            <button type="button" class="p-0 opacity-25 btn btn-dark shadow rounded-circle border position-absolute translate-middle top-50 start-0 d-flex justify-content-center align-items-center" 
+            style="width: 30px; height: 30px;" id="scrollLeft">
+                <span class="carousel-control-prev-icon" aria-hidden="true" style="width: 16px;"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button type="button" class="p-0 opacity-25 btn btn-dark shadow rounded-circle border position-absolute translate-middle top-50 start-100 d-flex justify-content-center align-items-center" 
+            style="width: 30px; height: 30px;" id="scrollRight">
+                <span class="carousel-control-next-icon" aria-hidden="true" style="width: 16px;"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
     </div>
 </section>
+
+<style>
+    #courseCard{
+        height: 270px;
+        width: 250px;
+    }
+    #courseCardContainer {
+        height: 270px !important;
+        width: 250px !important;
+    }
+    @media screen and (max-width: 768px) {
+        #courseCard{
+            height: 350px;
+            width: 330px;
+        }
+        #courseCardContainer {
+            height: 350px !important;
+            width: 330px !important;
+        }
+    }
+</style>
