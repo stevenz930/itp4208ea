@@ -7,16 +7,7 @@
 
 <div class="">
 
-  {% if user.is_authenticated %}
-  <div class="container">
-    <h1>Welcome back, {{ user.username }}!</h1>
-  </div>
-    {% comment %} <p><a href="{#}">Password Change</a></p>
-    <form action="{% url 'logout' %}" method="post">
-      {% csrf_token %}
-      <button type="submit">Log Out</button>
-    </form> {% endcomment %}
-  {% endif %}
+  {% include 'include/home_modal.html'%}
 
   {% include 'include/home_cate.html'%}
 

@@ -10,11 +10,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
     <link rel="stylesheet" href="{% static 'css/autocomplete.css' %}">
+    <link rel="stylesheet" href="{% static 'css/course_list.css' %}">
     {% include 'include/css.html'%}
   <title>ITP4208-EA</title>
 </head>
 
-<body class="overflow-x-hidden">
+<body class="">
 
   {% include 'include/nav.html'%}
 
@@ -22,10 +23,13 @@
   {% endblock %}
 
   {% include 'include/footer.html'%}
-  <script src="{% static 'js/home_course_recommand.js' %}"></script>
-  <script src="{% static 'js/home_instructor_recommand.js' %}"></script>
  
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="{% static 'js/home_course_recommand.js' %}"></script>
+  <script src="{% static 'js/home_instructor_recommand.js' %}"></script>
+  <script src="{% static 'js/home_modal.js' %}"></script>
+  
   <script src="{% static 'js/course_list.js' %}"></script>
   <script src="{% static 'js/autocomplete.js' %}"></script>
   
