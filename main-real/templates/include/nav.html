@@ -35,7 +35,7 @@
         <!-- 右側圖標區 -->
         <div class="d-flex align-items-center justify-content-between">
           <!-- 探索圖標 (固定顯示) -->
-          <a href="{% url 'course_list' %}" class="btn btn-link text-dark mx-2 d-none d-lg-block" title="Explore">
+          <a href="{% url 'course_list' %}?subject=all" class="btn btn-link text-dark mx-2 d-none d-lg-block" title="Explore">
             <i class="fas fa-compass fs-5"></i>
           </a>
           <a href="{% url 'course_list' %}" class="btn btn-outline-secondary m-2 d-lg-none" title="Explore">Explore
@@ -63,8 +63,7 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                   <li><a class="dropdown-item" href="{% url 'my_study' %}"><i class="fa-solid fa-bookmark me-2"></i>Study</a></li>
-                  <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
-                  <li><a class="dropdown-item" href="{% url 'profile_settings' %}"><i class="fas fa-user me-2"></i>Setting</a></li>
+                  <li><a class="dropdown-item" href="{% url 'profile_settings' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li>
                     <form action="{% url 'logout' %}" method="post" class="d-inline">

@@ -16,7 +16,7 @@
               title="Follow us on Facebook"><i class="fab fa-facebook-f"></i></a>
             <a href="https://twitter.com/learnhub_official" class="text-white me-3" target="_blank"
               title="Follow us on Twitter"><i class="fab fa-twitter"></i></a>
-            <a href="https://instagram.com/learnhu" class="text-white me-3" target="_blank"
+            <a href="https://instagram.com/learnhub_official" class="text-white me-3" target="_blank"
               title="Follow us on Instagram"><i class="fab fa-instagram"></i></a>
             <a href="https://linkedin.com/company/learnhub_official" class="text-white" target="_blank"
               title="Connect with us on LinkedIn"><i class="fab fa-linkedin-in"></i></a>
@@ -27,15 +27,16 @@
         <div class="col-md-6">
           <div class="row">
             <div class="col-6">
-              <h5 class="mb-3">Quick Links</h5>
+              <h5 class="mb-3 font-monospace fw-bold">Quick Links</h5>
               <ul class="list-unstyled">
-                <li class="mb-2"><a href="{% url 'home' %}" class="text-decoration-none text-muted">Home</a></li>                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">About Us</a></li>
-                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Services</a></li>
-                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Contact</a></li>
+                <li class="mb-2"><a href="{% url 'home' %}" class="text-decoration-none text-muted">Home</a></li>
+                <li class="mb-2"><a href="/#home_course_recommand" class="text-decoration-none text-muted">Popular Courses</a></li>
+                <li class="mb-2"><a href="{% url 'course_list' %}?subject=all" class="text-decoration-none text-muted">All Courses</a></li>
+                <li class="mb-2"><a href="/#home_instructor_recommand" class="text-decoration-none text-muted">Our Instructor</a></li>
               </ul>
             </div>
             <div class="col-6">
-              <h5 class="mb-3">Legal</h5>
+              <h5 class="mb-3 font-monospace fw-bold">Legal</h5>
               <ul class="list-unstyled">
                 <li class="mb-2"><a href="{% url 'privacy_policy' %}" class="text-decoration-none text-muted">Privacy Policy</a></li>
                 <li class="mb-2"><a href="{% url 'terms_of_service' %}" class="text-decoration-none text-muted">Terms of Service</a></li>

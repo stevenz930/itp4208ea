@@ -105,14 +105,14 @@
                         </a>
                     </div>
                 
-                    <div class="d-flex flex-wrap gap-3 text-light">
+                    <div class="d-flex flex-wrap text-light flex-column">
                         <div>
                             <img src="{{ course.instructor.avatar.url }}" class="rounded-circle" style="width: 30px; height: 30px;">
-                            <span class="text-decoration-underline" onclick="window.location.href='{% url 'instructor_detail' course.instructor.id %}';" style="cursor: pointer;">{{ course.instructor.get_full_name }}</span>
+                            <span class="text-decoration-underline fw-bold" onclick="window.location.href='{% url 'instructor_detail' course.instructor.id %}';" style="cursor: pointer;">{{ course.instructor.get_full_name }}</span>
                         </div>
                         <div>
                             <i class="bi bi-calendar me-2"></i>
-                            <span>Last updated: {{ course.updated_at|date:"M d, Y" }}</span>
+                            <small class="text-secondary">Last updated: {{ course.updated_at|date:"M d, Y" }}</small>
                         </div>
                     </div>
                 </div>
