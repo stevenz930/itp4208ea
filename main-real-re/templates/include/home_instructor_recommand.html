@@ -1,0 +1,28 @@
+<section class="py-5 bg-light">
+    <div class="container">
+    
+        <h2 class="mb-4">Our Instructor</h2>
+
+        <div class="container mw-75 position-relative"><!-- nav tap with courseType -->
+            <ul class="nav nav-underline d-flex flex-nowrap overflow-hidden px-0 align-items-end" id="scrollInstructor" role="tablist" style="max-width: 100%; width: 100%;">
+                {% for instructor in instructors %}
+                    <div class="card" role="presentation" onclick="window.location.href='{% url 'instructor_detail' instructor.id %}';" style="min-width: 25%; cursor: pointer;">
+                        <img src="{{ instructor.avatar.url }}" class="card-img-top">
+                        <p class="card-subtitle fs-5 fw-bold mx-2 my-3">{{ instructor.first_name }} {{ instructor.last_name }}</p>
+                    </div>
+                {% endfor %}
+            </ul>
+
+            <button type="button" class="p-0 opacity-25 btn btn-dark shadow rounded-circle border position-absolute translate-middle top-50 start-0 d-flex justify-content-center align-items-center" 
+            style="width: 30px; height: 30px;" id="scrollLeftInstructor">
+                <span class="carousel-control-prev-icon" aria-hidden="true" style="width: 16px;"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button type="button" class="p-0 opacity-25 btn btn-dark shadow rounded-circle border position-absolute translate-middle top-50 start-100 d-flex justify-content-center align-items-center" 
+            style="width: 30px; height: 30px;" id="scrollRightInstructor">
+                <span class="carousel-control-next-icon" aria-hidden="true" style="width: 16px;"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+</section>
