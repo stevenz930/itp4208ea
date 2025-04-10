@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .social-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    .info-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .bg-gradient-instagram {
+        background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    }
+    
+    .bg-linkedin {
+        background-color: #0a66c2;
+    }
+
+    .section-title {
+        padding-left: 1%;
+    }
+    
+    .profile-card {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .avatar-wrapper {
+        transition: all 0.3s ease;
+    }
+
+    .avatar-wrapper:hover {
+        background-color: #f8f9fa !important;
+    }
+
+    .form-control:focus {
+        border-color: #dee2e6;
+        box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group-text {
+        min-width: 40px;
+        justify-content: center;
+    }
+
+    .alert {
+        border-left: 4px solid #198754;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            {% if messages %}
+                {% for message in messages %}
+                    {% if 'profile_settings' in message.extra_tags %}
+                        <div class="alert alert-success border-0 shadow-sm mb-4 rounded-3">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-sm">
+                <!-- Profile Header -->
+                <div class="card-header bg-light px-4 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0 fw-bold">Profile Settings</h2>
+                        <button type="submit" form="profileForm" class="btn btn-dark">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card-body p-0">
+                    <form id="profileForm" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        
+                        <!-- Avatar and Basic Info -->
+                        <div class="row align-items-center p-4">
+                            <div class="col-md-3 text-center mb-4 mb-md-0">
+                                <div class="position-relative d-inline-block">
+                                    <div class="avatar-wrapper rounded-circle bg-light p-1 mx-auto" style="width: 160px; height: 160px;">
+                                        {% if request.user.avatar %}
+                                            <img src="{{ request.user.avatar.url }}" 
+                                                 alt="{{ request.user.username }}" 
+                                                 class="rounded-circle" 
+                                                 width="154" height="154" 
+                                                 style="object-fit: cover;"
+                                                 id="avatarPreview">
+                                        {% else %}
+                                            <img src="{% static 'images/blank_profile.png' %}" 
+                                                 alt="Default avatar" 
+                                                 class="rounded-circle" 
+                                                 width="154" height="154" 
+                                                 style="object-fit: cover;"
+                                                 id="avatarPreview">
+                                        {% endif %}
+                                    </div>
+                                    <label for="id_avatar" class="btn btn-light btn-sm rounded-circle position-absolute bottom-0 end-0 shadow-sm" 
+                                           style="width: 32px; height: 32px;">
+                                        <i class="fas fa-camera"></i>
+                                        <input type="file" name="avatar" id="id_avatar" class="d-none" accept="image/*">
+                                    </label>
+                                </div>
+                                <div class="small text-muted mt-2">Click to change profile photo</div>
+                            </div>
+                        </div>
+
+                        <!-- Basic Information Section -->
+                        <div class="profile-card">
+                            <div class="card-header bg-white">
+                                <h3 class="section-title">Basic Information</h3>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="id_first_name" class="form-label">First Name</label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.first_name.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="id_last_name" class="form-label">Last Name</label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.last_name.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <label class="form-label">Bio</label>
+                                        {{ form.bio }}
+                                        {% if form.bio.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.bio.errors }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">Brief description about yourself</div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="profile_public" 
+                                                   id="id_profile_public" {% if request.user.profile_public %}checked{% endif %}>
+                                            <label class="form-check-label text-muted" for="id_profile_public">
+                                                Make my profile public
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Social Media Section -->
+                        <div class="profile-card">
+                            <div class="card-header bg-white">
+                                <h3 class="section-title">Social Media</h3>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="fab fa-facebook-f text-primary"></i>
+                                            </span>
+                                            {{ form.facebook_url }}
+                                        </div>
+                                        {% if form.facebook_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.facebook_url.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="fab fa-twitter text-info"></i>
+                                            </span>
+                                            {{ form.twitter_url }}
+                                        </div>
+                                        {% if form.twitter_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.twitter_url.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="fab fa-instagram text-danger"></i>
+                                            </span>
+                                            {{ form.instagram_url }}
+                                        </div>
+                                        {% if form.instagram_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.instagram_url.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="fab fa-linkedin-in text-primary"></i>
+                                            </span>
+                                            {{ form.linkedin_url }}
+                                        </div>
+                                        {% if form.linkedin_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.linkedin_url.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
