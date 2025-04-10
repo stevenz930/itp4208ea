@@ -1,240 +1,162 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile filter sidebar elements
+    // Mobile filter sidebar toggle
     const mobileFilterBtn = document.getElementById('mobileFilterBtn');
     const filterSidebar = document.getElementById('filterSidebar');
     const filterOverlay = document.getElementById('filterOverlay');
     const closeFilterSidebar = document.getElementById('closeFilterSidebar');
 
-    // Mobile filter sidebar toggle
-    function closeMobileFilters() {
-        filterSidebar?.classList.remove('show');
-        if (filterOverlay) {
-            filterOverlay.style.display = 'none';
-        }
-        document.body.style.overflow = 'auto';
+    function toggleMobileFilters() {
+        filterSidebar.classList.toggle('show');
+        filterOverlay.style.display = filterSidebar.classList.contains('show') ? 'block' : 'none';
+        document.body.style.overflow = filterSidebar.classList.contains('show') ? 'hidden' : 'auto';
     }
 
-    if (mobileFilterBtn && filterSidebar && filterOverlay) {
-        mobileFilterBtn.addEventListener('click', function() {
-            filterSidebar.classList.add('show');
-            filterOverlay.style.display = 'block';
-            document.body.style.overflow = 'hidden';
+    if (mobileFilterBtn) mobileFilterBtn.addEventListener('click', toggleMobileFilters);
+    if (closeFilterSidebar) closeFilterSidebar.addEventListener('click', toggleMobileFilters);
+    if (filterOverlay) filterOverlay.addEventListener('click', toggleMobileFilters);
+
+    // Filter application function
+    function applyFilters() {
+        const activeForm = document.querySelector('.filter-sidebar.show form') || 
+                         document.getElementById('desktopFilterForm');
+        
+        if (!activeForm) return;
+        
+        const urlParams = new URLSearchParams();
+        const currentParams = new URLSearchParams(window.location.search);
+
+        // Handle category filters
+        const categoryCheckboxes = activeForm.querySelectorAll('input[name="category"]:checked');
+        categoryCheckboxes.forEach(checkbox => {
+            urlParams.append('category', checkbox.value);
         });
 
-        closeFilterSidebar?.addEventListener('click', closeMobileFilters);
-        filterOverlay.addEventListener('click', closeMobileFilters);
-    }
+        // Handle level filters
+        const levelCheckboxes = activeForm.querySelectorAll('input[name="level"]:checked');
+        levelCheckboxes.forEach(checkbox => {
+            urlParams.append('level', checkbox.value);
+        });
 
-    // Handle filter changes (including price range)
-    function updateFilters() {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        // Update price range parameters
-        const desktopMinPrice = document.getElementById('desktopMinPriceInput')?.value;
-        const desktopMaxPrice = document.getElementById('desktopMaxPriceInput')?.value;
-        const mobileMinPrice = document.getElementById('minPriceInput')?.value;
-        const mobileMaxPrice = document.getElementById('maxPriceInput')?.value;
-        
-        if (desktopMinPrice && desktopMaxPrice) {
-            urlParams.set('min_price', desktopMinPrice);
-            urlParams.set('max_price', desktopMaxPrice);
-        } else if (mobileMinPrice && mobileMaxPrice) {
-            urlParams.set('min_price', mobileMinPrice);
-            urlParams.set('max_price', mobileMaxPrice);
+        // Handle price range
+        const minPrice = activeForm.querySelector('input[name="min_price"]').value || '0';
+        const maxPrice = activeForm.querySelector('input[name="max_price"]').value || '100';
+        urlParams.set('min_price', minPrice);
+        urlParams.set('max_price', maxPrice);
+
+        // Preserve subject if exists
+        const currentSubject = currentParams.get('subject');
+        if (currentSubject) {
+            urlParams.set('subject', currentSubject);
         }
-        
-        // Reset to first page when filters change
+
+        // Preserve sort if exists
+        const currentSort = currentParams.get('sort');
+        if (currentSort) {
+            urlParams.set('sort', currentSort);
+        }
+
+        // Reset to first page
         urlParams.set('page', '1');
-        
-        // Close mobile filters if needed
-        if (window.innerWidth < 992) {
-            closeMobileFilters();
+
+        // Close mobile filters if open
+        if (filterSidebar.classList.contains('show')) {
+            toggleMobileFilters();
         }
-        
-        // Update URL and reload
+
         window.location.search = urlParams.toString();
     }
 
-    // Handle checkbox changes
-    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateFilters);
-    });
-
-    // Initialize price sliders with new behavior
-    function initializeSlider(slider, maxDisplay, maxInput, minInput = null) {
-        if (slider) {
-            const maxValue = slider.max;
-            const currentValue = slider.value;
-            
-            // Update progress display (if exists)
-            const progress = slider.parentElement.querySelector('.price-progress');
+    // Price slider setup
+    function setupPriceSlider(slider, display, input, progress) {
+        if (!slider || !display || !input) return;
+        
+        slider.addEventListener('input', function() {
+            const value = this.value;
+            display.textContent = `$${value}`;
+            input.value = value;
             if (progress) {
-                progress.style.width = `${(currentValue / maxValue) * 100}%`;
+                progress.style.width = `${(value / slider.max) * 100}%`;
             }
-            
-            slider.addEventListener('input', function() {
-                const value = this.value;
-                const max = this.max;
-                
-                // Update progress display (if exists)
-                if (progress) {
-                    progress.style.width = `${(value / max) * 100}%`;
-                }
-                
-                // Update display values
-                if (maxDisplay) {
-                    maxDisplay.textContent = `$${value}`;
-                }
-                if (maxInput) {
-                    maxInput.value = value;
-                }
-            });
-            
-            // Change to use our updateFilters function instead of direct form submit
-            slider.addEventListener('change', updateFilters);
-        }
+        });
+        
+        slider.addEventListener('change', applyFilters);
     }
 
-    // Initialize both sliders
-    initializeSlider(
+    // Initialize sliders
+    setupPriceSlider(
         document.getElementById('priceSlider'),
         document.getElementById('maxPriceDisplay'),
         document.getElementById('maxPriceInput'),
-        document.getElementById('minPriceInput')
+        document.querySelector('.price-progress')
     );
-
-    initializeSlider(
+    
+    setupPriceSlider(
         document.getElementById('desktopPriceSlider'),
         document.getElementById('desktopMaxPriceDisplay'),
         document.getElementById('desktopMaxPriceInput'),
-        document.getElementById('desktopMinPriceInput')
+        document.getElementById('desktopPriceProgress')
     );
 
-    // Initialize checkbox states from URL
-    function updateCheckboxStates() {
+    // Checkbox setup
+    function setupCheckboxes() {
         const urlParams = new URLSearchParams(window.location.search);
-
-        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            const paramName = checkbox.name;
-            const paramValue = checkbox.value;
-
-            checkbox.checked = urlParams.getAll(paramName).includes(paramValue);
+        
+        document.querySelectorAll('input[type="checkbox"][name="category"], input[type="checkbox"][name="level"]').forEach(checkbox => {
+            checkbox.checked = urlParams.getAll(checkbox.name).includes(checkbox.value);
+            
+            checkbox.addEventListener('change', applyFilters);
         });
-    }
-    updateCheckboxStates();
-});
 
+        // Initialize price values from URL
+        const maxPrice = urlParams.get('max_price') || 
+                        document.getElementById('priceSlider')?.max || 
+                        document.getElementById('desktopPriceSlider')?.max || 
+                        '100';
+        
+        const minPrice = urlParams.get('min_price') || '0';
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Mobile filter sidebar toggle
-    const mobileFilterBtn = document.getElementById('mobileFilterBtn');
-    const filterSidebar = document.getElementById('filterSidebar');
-    const filterOverlay = document.getElementById('filterOverlay');
-    const closeFilterSidebar = document.getElementById('closeFilterSidebar');
-    
-
-    mobileFilterBtn.addEventListener('click', function () {
-        filterSidebar.classList.add('show');
-        filterOverlay.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    });
-
-    function closeMobileFilters() {
-        filterSidebar.classList.remove('show');
-        filterOverlay.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-
-    closeFilterSidebar.addEventListener('click', closeMobileFilters);
-    filterOverlay.addEventListener('click', closeMobileFilters);
-
-    // Toggle all filters button
-    const toggleAllBtn = document.getElementById('toggleAllFilters');
-    const allCollapses = document.querySelectorAll('.filter-sidebar .collapse');
-    let allExpanded = false;
-
-    if (toggleAllBtn) {
-        toggleAllBtn.addEventListener('click', function () {
-            allExpanded = !allExpanded;
-
-            if (allExpanded) {
-                toggleAllBtn.querySelector('span').textContent = 'Collapse All';
-                toggleAllBtn.querySelector('i').className = 'fas fa-chevron-up ms-1';
-            } else {
-                toggleAllBtn.querySelector('span').textContent = 'Expand All';
-                toggleAllBtn.querySelector('i').className = 'fas fa-chevron-down ms-1';
+        // Update mobile price display
+        if (document.getElementById('maxPriceInput')) {
+            document.getElementById('maxPriceInput').value = maxPrice;
+            document.getElementById('minPriceInput').value = minPrice;
+            document.getElementById('maxPriceDisplay').textContent = `$${maxPrice}`;
+            if (document.getElementById('priceSlider')) {
+                document.getElementById('priceSlider').value = maxPrice;
             }
-
-            allCollapses.forEach(collapse => {
-                const bsCollapse = new bootstrap.Collapse(collapse, {
-                    toggle: true
-                });
-            });
-        });
+        }
+        
+        // Update desktop price display
+        if (document.getElementById('desktopMaxPriceInput')) {
+            document.getElementById('desktopMaxPriceInput').value = maxPrice;
+            document.getElementById('desktopMinPriceInput').value = minPrice;
+            document.getElementById('desktopMaxPriceDisplay').textContent = `$${maxPrice}`;
+            if (document.getElementById('desktopPriceSlider')) {
+                document.getElementById('desktopPriceSlider').value = maxPrice;
+            }
+        }
     }
 
-    // Rotate chevron icons when individual filters are toggled
-    document.querySelectorAll('.btn-filter').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const icon = this.querySelector('i');
-            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+    // Sort dropdown initialization
+    function initializeSortDropdown() {
+        const sortDropdown = document.getElementById('sortDropdown');
+        if (!sortDropdown) return;
 
-            if (isExpanded) {
-                icon.style.transform = 'rotate(0deg)';
-            } else {
-                icon.style.transform = 'rotate(180deg)';
-            }
-        });
-    });
-
-    // Handle filter changes
-    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const filterName = this.name;
-            const filterValue = this.value;
-
-            // Get all currently checked boxes of this filter type
-            const checkedBoxes = Array.from(document.querySelectorAll(`input[name="${filterName}"]:checked`));
-
-            // Remove all existing parameters for this filter
-            urlParams.delete(filterName);
-
-            // Add back all checked boxes of this filter type
-            checkedBoxes.forEach(checkedBox => {
-                urlParams.append(filterName, checkedBox.value);
-            });
-
-            // If this checkbox was just unchecked, make sure it's not in the URL
-            if (!this.checked && urlParams.getAll(filterName).includes(filterValue)) {
-                const values = urlParams.getAll(filterName).filter(v => v !== filterValue);
-                urlParams.delete(filterName);
-                values.forEach(v => urlParams.append(filterName, v));
-            }
-
-            // Reset to first page when filters change
-            urlParams.set('page', '1');
-
-            // Close mobile filters if in mobile view
-            if (window.innerWidth < 992) {
-                closeMobileFilters();
-            }
-
-            // Submit the form with updated parameters
-            window.location.search = urlParams.toString();
-        });
-    });
-
-    // Initialize checkbox states from URL
-    function updateCheckboxStates() {
         const urlParams = new URLSearchParams(window.location.search);
+        const currentSort = urlParams.get('sort') || 'popular';
+        const sortTextMap = {
+            'popular': 'Most Popular',
+            'highest': 'Highest Rated',
+            'newest': 'Newest',
+            'price_low': 'Price Low to High',
+            'price_high': 'Price High to Low'
+        };
 
-        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            const paramName = checkbox.name;
-            const paramValue = checkbox.value;
-
-            checkbox.checked = urlParams.getAll(paramName).includes(paramValue);
-        });
+        // Update dropdown text
+        const dropdownText = sortTextMap[currentSort] || 'Most Popular';
+        sortDropdown.innerHTML = `Sort by: ${dropdownText}`;
     }
-    updateCheckboxStates();
+
+    // Initialize everything
+    setupCheckboxes();
+    initializeSortDropdown();
 });
