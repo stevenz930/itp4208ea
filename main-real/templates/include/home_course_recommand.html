@@ -50,8 +50,8 @@
                                                     {% comment %} <p class="card-text fs-5 fw-bold mt-1">${{ course.price }}</p> {% endcomment %}
                                                     <div>
                                                         {% if course.is_free %}
-                                                            <!-- <span class="current-price fs-5 fw-bold mt-1 text-dark-emphasis text-decoration-line-through">${{ course.price }}</span> -->
-                                                            <span class="badge bg-warning text-dark fw-bold">FREE</span>
+                                                            <span class="current-price fs-5 fw-bold mt-1 text-dark-emphasis text-decoration-line-through">${{ course.price }}</span>
+                                                            <span class="badge bg-danger">FREE</span>
                                                         {% else %}
                                                             <span class="current-price fs-5 fw-bold mt-1">${{ course.price }}</span>
                                                             {% if course.discount_price %}

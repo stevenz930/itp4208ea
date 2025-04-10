@@ -6,24 +6,24 @@ document.addEventListener('DOMContentLoaded', function() {
     //console.log(scrollLeftInstructor);
     //console.log(scrollRightInstructor);
 
-    scrollTableHorizontal(scrollInstructor, scrollLeftInstructor, scrollRightInstructor);
+    scrollTableHorizontalInstructor(scrollInstructor, scrollLeftInstructor, scrollRightInstructor);
 })
 
-function scrollTableHorizontal(scrollTable, scrollLeft, scrollRight) {
+function scrollTableHorizontalInstructor(scrollTable, scrollLeft, scrollRight) {
     if (!scrollTable){
         return;
     }
     else{
         scrollLeft.addEventListener('click', function() {
             scrollTable.scrollBy({
-                left: -(scrollTable.offsetWidth),
+                left: -(scrollTable.offsetWidth)-20,
                 behavior: 'smooth'
             })
         })
 
         scrollRight.addEventListener('click', function() {
             scrollTable.scrollBy({
-                left: scrollTable.offsetWidth,
+                left: scrollTable.offsetWidth+20,
                 behavior: 'smooth'
             })
         })
