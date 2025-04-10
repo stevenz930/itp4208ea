@@ -102,7 +102,7 @@
     <div class="container">
         <ul class="nav subject-tabs">
             <li class="nav-item">
-                <a class="nav-link {% if not current_subject %}active{% endif %}" 
+                <a class="nav-link{% if not current_subject %}active{% endif %}" 
                    href="?subject=all">All</a>
             </li>
             {% for subject in subjects %}
@@ -173,7 +173,7 @@
                         </div>
                     </div>
                     
-                    Duration Filter
+                    {% comment %} Duration Filter {% endcomment %}
                     <div class="mb-4">
                         <button class="btn btn-filter w-100 text-start d-flex justify-content-between align-items-center" 
                                 data-bs-toggle="collapse" data-bs-target="#desktopDurationCollapse">
@@ -205,8 +205,27 @@
             
             <!-- Course List -->
             <div class="col-lg-9">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4>All Courses</h4>
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    
+                    <div>
+                        {% if current_subject == 'all' %}
+                            <div class="d-flex">
+                                <h4 class="me-3 text-info fw-bold">All</h4>
+                                <h4 class="pe-5 me-5">Courses</h4>
+                            </div>
+                        {% else %}
+                            {% for subject in subjects %}
+                                {% if current_subject == subject.slug %}
+                                    <div class="d-flex">
+                                        <h4>All</h4>
+                                        <h4 class="mx-3 text-info fw-bold">{{ subject.name }}</h4>
+                                        <h4>Courses</h4>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
                             Sort by: 
@@ -248,11 +267,12 @@
                                 <div class="course-price d-flex justify-content-between align-items-center">
                                     <div>
                                         {% if course.is_free %}
-                                            <span class="badge bg-success">FREE</span>
+                                            <span class="current-price fs-5 fw-bold text-dark-emphasis mt-1 text-decoration-line-through">${{ course.price }}</span>
+                                            <span class="badge bg-danger">FREE</span>
                                         {% else %}
-                                            <span class="current-price">${{ course.price }}</span>
+                                            <span class="current-price fs-5 fw-bold mt-1">${{ course.price }}</span>
                                             {% if course.discount_price %}
-                                            <span class="original-price">${{ course.discount_price }}</span>
+                                            <span class="original-price fs-5 fw-bold mt-1">${{ course.discount_price }}</span>
                                             {% endif %}
                                         {% endif %}
                                     </div>
@@ -286,17 +306,47 @@
                         </li>
                         {% endif %}
                         
+                        {% comment %}                         
                         {% for num in courses.paginator.page_range %}
                             {% if num == courses.number %}
                             <li class="page-item active">
                                 <span class="page-link">{{ num }}</span>
                             </li>
                             {% else %}
-                            <li class="page-item">
-                                <a class="page-link" href="?{% preserve_filters request 'page' num %}">{{ num }}</a>
-                            </li>
+                                {%if num > 5 %}
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% preserve_filters request 'page' num %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
+                        {% endcomment %}
+
+                        {% comment %} number pages {% endcomment %}
+                        <li class="page-item {% if courses.number == 1 %}active{% endif %}">
+                            <a class="page-link" href="?{% preserve_filters request 'page' 1 %}">1</a>
+                        </li>
+
+                        {% for num in courses.paginator.page_range %}
+                            {% if num <= 5 and num > 1 and courses.number <= 5 %}
+                                <li class="page-item {% if courses.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?{% preserve_filters request 'page' num %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                            {% if num >= 6 and courses.number >= 6 %}
+                                <li class="page-item {% if courses.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?{% preserve_filters request 'page' num %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {%if courses.number <= 5 %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% preserve_filters request 'page' 6 %}">...</a>
+                            </li>
+                        {% endif %}
+                        {% comment %} number pages {% endcomment %}
                         
                         {% if courses.has_next %}
                         <li class="page-item">

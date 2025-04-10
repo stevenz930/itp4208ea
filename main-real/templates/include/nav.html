@@ -33,12 +33,12 @@
         </div>
 
         <!-- 右側圖標區 -->
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between">
           <!-- 探索圖標 (固定顯示) -->
           <a href="{% url 'course_list' %}" class="btn btn-link text-dark mx-2 d-none d-lg-block" title="Explore">
             <i class="fas fa-compass fs-5"></i>
           </a>
-          <a href="{% url 'course_list' %}" class="btn btn-outline-secondary mx-2 d-lg-none" title="Explore">Explore
+          <a href="{% url 'course_list' %}" class="btn btn-outline-secondary m-2 d-lg-none" title="Explore">Explore
           </a>
     
           {% if user.is_authenticated %}
@@ -59,7 +59,7 @@
               <!-- 用戶下拉選單 -->
               <div class="dropdown">
                 <a class="btn btn-link text-dark dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fas fa-user"></i>
+                  <i class="fas fa-user fs-5"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                   <li><a class="dropdown-item" href="{% url 'my_study' %}"><i class="fa-solid fa-bookmark me-2"></i>Study</a></li>

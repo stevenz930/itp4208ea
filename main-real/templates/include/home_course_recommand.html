@@ -1,7 +1,7 @@
 <section class="py-5 bg-light">
     <div class="container">
     
-        <h2 class="mb-4">Popular Courses</h2>
+        <h1 class="mb-4 font-monospace fw-bold">Popular Courses</h1>
     
         <div class="container mw-75 position-relative"><!-- nav tap with courseType -->
             <ul class="nav nav-underline d-flex flex-nowrap overflow-hidden px-0 align-items-end" id="myTab" role="tablist" style="max-width: 100%; width: 100%;">
@@ -47,7 +47,18 @@
                                                 <div class="card-body">
                                                     <p class="card-title fs-6 fw-bold text-truncate">{{ course.title }}</p>
                                                     <p class="card-subtitle text-body-tertiary fs-6 ">{{ course.instructor.first_name }} {{ course.instructor.last_name }}</p>
-                                                    <p class="card-text fs-5 fw-bold mt-1">${{ course.price }}</p>
+                                                    {% comment %} <p class="card-text fs-5 fw-bold mt-1">${{ course.price }}</p> {% endcomment %}
+                                                    <div>
+                                                        {% if course.is_free %}
+                                                            <span class="current-price fs-5 fw-bold mt-1 text-dark-emphasis text-decoration-line-through">${{ course.price }}</span>
+                                                            <span class="badge bg-danger">FREE</span>
+                                                        {% else %}
+                                                            <span class="current-price fs-5 fw-bold mt-1">${{ course.price }}</span>
+                                                            {% if course.discount_price %}
+                                                            <span class="original-price fs-5 fw-bold mt-1">${{ course.discount_price }}</span>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </div>
                                                     <!--a href="#" class="btn btn-primary btn-sm">View more</a-->
                                                 </div>
                                             </div>
