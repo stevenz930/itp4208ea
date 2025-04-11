@@ -54,7 +54,6 @@ class ProfileSettingsForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'bio': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
-
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email and CustomUser.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
