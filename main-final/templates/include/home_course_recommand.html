@@ -7,7 +7,7 @@
             <ul class="nav nav-underline d-flex flex-nowrap overflow-hidden px-0 align-items-end" id="myTab" role="tablist" style="max-width: 100%; width: 100%;">
                 {% for coursetype in coursetypes %}
                     <li class="nav-item" role="presentation">
-                        <button class="font-monospace nav-link fw-bold px-0 {% if forloop.first %} active {% else %} text-secondary {% endif %}" 
+                        <button class="font-monospace text-secondary nav-link fw-bold px-0 {% if forloop.first %} active {% else %} {% endif %}" 
                                 id="{{ coursetype.id }}-tab" 
                                 data-bs-toggle="tab" 
                                 data-bs-target="#{{ coursetype.id }}" 
