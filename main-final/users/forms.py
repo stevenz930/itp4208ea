@@ -40,10 +40,10 @@ class ProfileSettingsForm(forms.ModelForm):
         model = CustomUser
         fields = [
             'avatar',
-            'first_name',
-            'last_name',
-            'bio',
             'profile_public',
+            'username',
+            'bio',
+            'email',
             'facebook_url',
             'twitter_url',
             'instagram_url',

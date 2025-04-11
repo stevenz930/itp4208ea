@@ -79,6 +79,8 @@ def setup_profile(request):
 @login_required
 def profile_settings(request):
     if request.method == 'POST':
+        print("[POST]", request.POST)
+        print("[FILE]", request.FILES)
         form = ProfileSettingsForm(
             data=request.POST,  
             files=request.FILES,  
