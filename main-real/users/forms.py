@@ -49,14 +49,20 @@ class ProfileSettingsForm(forms.ModelForm):
             'linkedin_url'
         ]
         widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'bio': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
         }
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Add Bootstrap classes to all fields automatically
-        for field in self.fields:
-            if field != 'avatar' and field != 'profile_public':
-                self.fields[field].widget.attrs.update({'class': 'form-control'})
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and CustomUser.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
+            raise forms.ValidationError("This email is already in use.")
+        return email
+    
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     # Add Bootstrap classes to all fields automatically
+    #     for field in self.fields:
+    #         if field != 'avatar' and field != 'profile_public':
+    #             self.fields[field].widget.attrs.update({'class': 'form-control'})

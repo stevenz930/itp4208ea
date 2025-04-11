@@ -79,12 +79,16 @@ def setup_profile(request):
 @login_required
 def profile_settings(request):
     if request.method == 'POST':
+        print("[POST]", request.POST)
+        print("[FILE]", request.FILES)
         form = ProfileSettingsForm(
             data=request.POST,  
             files=request.FILES,  
             instance=request.user
         )
-        if form.is_valid():
+        #print(form)
+        if form.is_valid():  
+            print("Valid form")
             form.save()
             messages.success(request, 'Profile updated successfully!', extra_tags='profile_settings')
             return redirect('profile_settings')
