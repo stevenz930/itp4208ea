@@ -1,0 +1,103 @@
+<!-- Mobile Filter Button -->
+<button class="mobile-filter-btn d-lg-none" id="mobileFilterBtn">
+    <i class="fas fa-sliders-h"></i>
+</button>
+   
+   <!-- Filter Overlay -->
+<div class="filter-overlay" id="filterOverlay"></div>
+   
+   <!-- Mobile Filter Sidebar -->
+   <div class="filter-sidebar d-lg-none" id="filterSidebar">
+    <form method="get" id="filterForm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Filters</h5>
+            <button class="btn btn-sm btn-link p-0 d-lg-none" id="closeFilterSidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="accordion" id="mobileFilterAccordion">
+            <!-- Categories Filter -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#categoriesCollapse">
+                        Categories
+                    </button>
+                </h2>
+                <div id="categoriesCollapse" class="accordion-collapse collapse show" data-bs-parent="#mobileFilterAccordion">
+                    <div class="accordion-body">
+                        <div class="filter-categories">
+                            {% for category in filtered_categories %}
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="category" 
+                                    id="category-{{ category.id }}" value="{{ category.id }}"
+                                    {% if category.id|stringformat:"s" in request.GET.getlist %}checked{% endif %}>
+                                <label class="form-check-label" for="category-{{ category.id }}">{{ category.name }}</label>
+                            </div>
+                            {% empty %}
+                            <div class="text-muted">No categories available for this subject</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level Filter -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#levelCollapse">
+                        Level
+                    </button>
+                </h2>
+                <div id="levelCollapse" class="accordion-collapse collapse show" data-bs-parent="#mobileFilterAccordion">
+                    <div class="accordion-body">
+                        {% for level in level_choices %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="level" 
+                                id="level-{{ level.0 }}" value="{{ level.0 }}"
+                                {% if level.0 in request.GET.getlist %}checked{% endif %}>
+                            <label class="form-check-label" for="level-{{ level.0 }}">{{ level.1 }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price Filter -->
+<div class="accordion-item">
+    <h2 class="accordion-header">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#priceCollapse">
+            Price Range
+        </button>
+    </h2>
+    <div id="priceCollapse" class="accordion-collapse collapse show" data-bs-parent="#mobileFilterAccordion">
+        <div class="accordion-body">
+            <div class="price-range-container">
+                <div class="price-label mb-2">Select Price Range</div>
+                <div class="price-slider">
+                    <div class="price-progress" id="mobilePriceProgress"></div>
+                    <input type="range" 
+                           class="price-range" 
+                           min="{{ price_range.min_price|default:0|floatformat:0 }}" 
+                           max="{{ price_range.max_price|default:100|floatformat:0 }}" 
+                           step="1" 
+                           value="{{ request.GET.max_price|default:price_range.max_price|default:100|floatformat:0 }}"
+                           id="priceSlider">
+                </div>
+                <div class="price-display mt-2">
+                    <span class="price-value">${{ request.GET.min_price|default:price_range.min_price|default:0|floatformat:0 }}</span>
+                    <span class="price-value" id="maxPriceDisplay">
+                        ${{ request.GET.max_price|default:price_range.max_price|default:100|floatformat:0 }}
+                    </span>
+                </div>
+                <input type="hidden" name="min_price" id="minPriceInput" value="{{ request.GET.min_price|default:price_range.min_price|default:0|floatformat:0 }}">
+                <input type="hidden" name="max_price" id="maxPriceInput" value="{{ request.GET.max_price|default:price_range.max_price|default:100|floatformat:0 }}">
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+        
+        <button type="submit" style="display: none;"></button>
+    </form>
+</div>

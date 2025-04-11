@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+{% include 'include/home_caro.html'%}
+
+<div class="">
+
+  {% include 'include/home_modal.html'%}
+
+  {% include 'include/home_cate.html'%}
+
+  {% include 'include/home_course_recommand.html' %}
+
+  {% include 'include/home_why.html'%}
+
+  {% include 'include/home_tes.html'%}
+
+  {% include 'include/home_instructor_recommand.html' %}
+
+</div>
+{% endblock %}

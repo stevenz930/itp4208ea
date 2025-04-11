@@ -1,0 +1,36 @@
+{% if user.is_authenticated %}
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-monospace fw-bold fs-3" id="exampleModalLabel">WELCOME</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="close"></button>
+            </div>
+            <div class="modal-body">
+                {% if user.is_authenticated and user.is_staff and user.is_superuser %}
+                    <p class="fs-5">Welcome back, Superuser!</p>
+                    <div class="d-flex">
+                        <p class="fs-5">Your are</p>
+                        <p class="fs-5 text-primary font-monospace fw-bold">&nbsp;{{ user.username }}</p>
+                    </div>
+                {% elif user.is_authenticated and user.is_staff %}
+                    <p class="fs-5">Welcome back, Staff!</p>
+                    <div class="d-flex">
+                        <p class="fs-5">Your are</p>
+                        <p class="fs-5 text-primary font-monospace fw-bold">&nbsp;{{ user.username }}</p>
+                    </div>
+                {% elif user.is_authenticated %}
+                    <p class="fs-5">Welcome back, User!</p>
+                    <div class="d-flex">
+                        <p class="fs-5">Your are</p>
+                        <p class="fs-5 text-primary font-monospace fw-bold">&nbsp;{{ user.username }}</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary fw-bold font-monospace" data-bs-dismiss="modal">CLOSE</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
