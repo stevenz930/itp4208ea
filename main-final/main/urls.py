@@ -19,7 +19,8 @@ from django.urls import path, include
 from users import views 
 from django.contrib.auth import views as auth_views
 from django.conf import settings
-from django.conf.urls.static import static # Make sure this import works
+from django.conf.urls.static import static
+from . import views_api
 
 urlpatterns = [
     path('', views.home_view, name='home'),
@@ -33,7 +34,10 @@ urlpatterns = [
     path('terms-of-service/', views.terms_of_service, name='terms_of_service'),
     path('refund-policy/', views.refund_policy, name='refund_policy'),
     path('faq/', views.faq, name='faq'),
-    
+    path('api/', views_api.api_root, name='api-root'),
+    path('api/health/', views_api.health_check, name='api-health'),
+    path('api/courses/', include('courses.urls_api')),
+    path('api/users/', include('users.urls_api')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

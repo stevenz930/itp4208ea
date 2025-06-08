@@ -23,3 +23,5 @@ py manage.py generate_data
 clean data:
 python manage.py cleanup_data 
 py manage.py cleanup_data 
+
+source venv/bin/activate
